@@ -13,6 +13,8 @@ public class DeleteUserUseCaseImpl implements DeleteUserUseCase {
   public void execute(Long id) {
     if (id == null) {
       throw new IllegalArgumentException("Id cannot be null.");
+    } else if (userGateway.findUserById(id).isEmpty()) {
+      throw new IllegalArgumentException("User not found with ID: " + id);
     }
 
     userGateway.deleteUser(id);
