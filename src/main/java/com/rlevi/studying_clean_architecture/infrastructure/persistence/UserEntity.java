@@ -3,6 +3,10 @@ package com.rlevi.studying_clean_architecture.infrastructure.persistence;
 import com.rlevi.studying_clean_architecture.core.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "users")
@@ -28,14 +32,11 @@ public class UserEntity {
   @Column(nullable = false)
   private Role role = Role.USER;
 
+  @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)
-  private Long createdAt;
+  private Instant createdAt;
 
+  @UpdateTimestamp
   @Column(name = "updated_at", nullable = false)
-  private Long updatedAt;
-
-  @PreUpdate
-  protected void onUpdate() {
-    this.updatedAt = System.currentTimeMillis();
-  }
+  private Instant updatedAt;
 }
