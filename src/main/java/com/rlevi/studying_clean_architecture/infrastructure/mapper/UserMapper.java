@@ -1,6 +1,7 @@
 package com.rlevi.studying_clean_architecture.infrastructure.mapper;
 
 import com.rlevi.studying_clean_architecture.core.entities.User;
+import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginRequest;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.register.UserRegisterRequest;
 import com.rlevi.studying_clean_architecture.infrastructure.persistence.UserEntity;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,19 @@ public class UserMapper {
                 dto.name(),
                 dto.password(),
                 null // Role will be set in the use case
+        );
+    }
+
+    /**
+     * Converts from UserLoginRequest to User domain entity
+     */
+    public User toDomain(UserLoginRequest dto) {
+        return new User(
+                null,
+                dto.email(),
+                null,
+                dto.password(),
+                null
         );
     }
 
