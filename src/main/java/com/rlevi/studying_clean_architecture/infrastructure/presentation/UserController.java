@@ -45,6 +45,7 @@ public class UserController {
     this.userMapper = userMapper;
   }
 
+  // Create user
   @PostMapping("/register")
   public ResponseEntity<UserRegisterResponse> registerUser(@Valid @RequestBody UserRegisterRequest request) {
     try {
@@ -63,6 +64,7 @@ public class UserController {
     }
   }
 
+  // User login
   @PostMapping("/login")
   public ResponseEntity<UserLoginResponse> loginUser(@Valid @RequestBody UserLoginRequest request) {
     try {
