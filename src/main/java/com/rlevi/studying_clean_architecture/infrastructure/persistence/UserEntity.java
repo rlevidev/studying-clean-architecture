@@ -3,6 +3,7 @@ package com.rlevi.studying_clean_architecture.infrastructure.persistence;
 import com.rlevi.studying_clean_architecture.core.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -29,7 +30,8 @@ public class UserEntity {
   private String passwordHash;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
+  @Column(nullable = false, columnDefinition = "user_role")
+  @ColumnTransformer(write = "?::user_role")
   private Role role = Role.USER;
 
   @CreationTimestamp
