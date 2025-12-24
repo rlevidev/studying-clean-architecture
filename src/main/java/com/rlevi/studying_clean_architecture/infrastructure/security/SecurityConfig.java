@@ -47,7 +47,9 @@ public class SecurityConfig {
             .sessionManagement(session -> session
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authorize -> authorize
-                    .requestMatchers("/api/v1/").permitAll()
+                    .requestMatchers(
+                            "/api/v1/users/register", "/api/v1/users/login"
+                    ).permitAll()
                     .anyRequest().authenticated())
             .exceptionHandling(ex -> ex.accessDeniedHandler(customAcessDeniedHandler)
                     .authenticationEntryPoint(customAuthenticationEntryPoint))
@@ -70,6 +72,7 @@ public class SecurityConfig {
     return source;
   }
 
+  @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
