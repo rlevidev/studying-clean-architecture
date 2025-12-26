@@ -2,6 +2,7 @@ package com.rlevi.studying_clean_architecture.infrastructure.presentation;
 
 import com.rlevi.studying_clean_architecture.core.entities.User;
 import com.rlevi.studying_clean_architecture.core.usecases.createuser.CreateUserUseCase;
+import com.rlevi.studying_clean_architecture.core.usecases.findallusers.FindAllUsersUseCase;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginRequest;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginResponse;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.register.UserRegisterRequest;
@@ -17,20 +18,25 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
   private final CreateUserUseCase createUserUseCase;
+  private final FindAllUsersUseCase findAllUsersUseCase;
   private final UserMapper userMapper;
   private final AuthenticationManager authenticationManager;
   private final JwtUtil jwtUtil;
 
   public UserController(
-          CreateUserUseCase createUserUseCase, 
-          UserMapper userMapper, 
+          CreateUserUseCase createUserUseCase,
+          FindAllUsersUseCase findAllUsersUseCase,
+          UserMapper userMapper,
           AuthenticationManager authenticationManager,
           JwtUtil jwtUtil) {
     this.createUserUseCase = createUserUseCase;
+    this.findAllUsersUseCase = findAllUsersUseCase;
     this.userMapper = userMapper;
     this.authenticationManager = authenticationManager;
     this.jwtUtil = jwtUtil;
@@ -85,5 +91,11 @@ public class UserController {
               .internalServerError()
               .body(UserLoginResponse.fail(e.getMessage()));
     }
+  }
+
+  @GetMapping("/all")
+  public ResponseEntity<List<User>> getAllUsers() {
+    List<User> users = findAllUsersUseCase.execute();
+    return ResponseEntity.ok(users);
   }
 }
