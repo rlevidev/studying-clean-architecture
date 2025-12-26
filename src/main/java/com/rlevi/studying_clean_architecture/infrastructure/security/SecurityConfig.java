@@ -50,6 +50,9 @@ public class SecurityConfig {
                     .requestMatchers(
                             "/api/v1/users/register", "/api/v1/users/login"
                     ).permitAll()
+                    .requestMatchers(
+                            "/api/v1/users/all"
+                    ).hasRole("ADMIN")
                     .anyRequest().authenticated())
             .exceptionHandling(ex -> ex.accessDeniedHandler(customAcessDeniedHandler)
                     .authenticationEntryPoint(customAuthenticationEntryPoint))
