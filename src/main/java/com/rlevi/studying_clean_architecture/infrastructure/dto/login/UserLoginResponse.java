@@ -7,12 +7,4 @@ public record UserLoginResponse(
   public static UserLoginResponse success(String token) {
     return new UserLoginResponse("User logged in successfully.", token);
   }
-
-  public static UserLoginResponse withMessage(String message) {
-    return new UserLoginResponse(message, null);
-  }
-
-  public static UserLoginResponse fail(String message) {
-    return new UserLoginResponse(message, null);
-  }
 }
