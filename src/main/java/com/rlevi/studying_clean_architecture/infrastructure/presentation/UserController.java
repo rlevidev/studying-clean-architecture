@@ -12,6 +12,7 @@ import com.rlevi.studying_clean_architecture.infrastructure.security.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -45,52 +46,34 @@ public class UserController {
   // Create user
   @PostMapping("/register")
   public ResponseEntity<UserRegisterResponse> registerUser(@Valid @RequestBody UserRegisterRequest request) {
-    try {
-      User userToCreate = userMapper.toDomain(request);
-      createUserUseCase.execute(userToCreate);
-      String token = jwtUtil.generateToken(request.email(), "ROLE_USER");
+    User userToCreate = userMapper.toDomain(request);
+    createUserUseCase.execute(userToCreate);
+    String token = jwtUtil.generateToken(request.email(), "ROLE_USER");
 
-      return ResponseEntity.ok(UserRegisterResponse.success(token));
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity
-              .badRequest()
-              .body(UserRegisterResponse.fail(e.getMessage()));
-    } catch (Exception e) {
-      return ResponseEntity
-              .internalServerError()
-              .body(UserRegisterResponse.fail(e.getMessage()));
-    }
+    return ResponseEntity.ok(UserRegisterResponse.success(token));
   }
 
   // User login
   @PostMapping("/login")
   public ResponseEntity<UserLoginResponse> loginUser(@Valid @RequestBody UserLoginRequest request) {
-    try {
-      Authentication authentication = authenticationManager.authenticate(
-              new UsernamePasswordAuthenticationToken(request.email(), request.password())
-      );
+    Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.email(), request.password())
+    );
 
-      if (authentication.isAuthenticated()) {
-        // Gets the role of the authenticated user
-        String role = authentication.getAuthorities().stream()
-                .findFirst()
-                .map(GrantedAuthority::getAuthority)
-                .orElse("ROLE_USER");
-        
-        // Generates the JWT token
-        String token = jwtUtil.generateToken(request.email(), role);
-        
-        return ResponseEntity.ok(UserLoginResponse.success(token));
-      } else {
-        return ResponseEntity.badRequest().body(UserLoginResponse.fail("Invalid email or password."));
-      }
-    } catch (AuthenticationException e) {
-      return ResponseEntity.badRequest().body(UserLoginResponse.fail("Invalid email or password."));
-    } catch (Exception e) {
-      return ResponseEntity
-              .internalServerError()
-              .body(UserLoginResponse.fail(e.getMessage()));
+    if (!authentication.isAuthenticated()) {
+      throw new BadCredentialsException("Authentication failed");
     }
+
+    // Gets the role of the authenticated user
+    String role = authentication.getAuthorities().stream()
+            .findFirst()
+            .map(GrantedAuthority::getAuthority)
+            .orElse("ROLE_USER");
+    
+    // Generates the JWT token
+    String token = jwtUtil.generateToken(request.email(), role);
+    
+    return ResponseEntity.ok(UserLoginResponse.success(token));
   }
 
   @GetMapping("/all")
