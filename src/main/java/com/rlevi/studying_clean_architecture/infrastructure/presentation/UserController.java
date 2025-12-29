@@ -7,6 +7,7 @@ import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginR
 import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginResponse;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.register.UserRegisterRequest;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.register.UserRegisterResponse;
+import com.rlevi.studying_clean_architecture.infrastructure.dto.response.UserResponse;
 import com.rlevi.studying_clean_architecture.infrastructure.mapper.UserMapper;
 import com.rlevi.studying_clean_architecture.infrastructure.security.JwtUtil;
 import jakarta.validation.Valid;
@@ -15,11 +16,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -77,8 +78,12 @@ public class UserController {
   }
 
   @GetMapping("/all")
-  public ResponseEntity<List<User>> getAllUsers() {
+  public ResponseEntity<List<UserResponse>> getAllUsers() {
     List<User> users = findAllUsersUseCase.execute();
-    return ResponseEntity.ok(users);
+    List<UserResponse> response = users.stream()
+            .map(userMapper::toResponse)
+            .collect(Collectors.toList());
+
+    return ResponseEntity.ok(response);
   }
 }

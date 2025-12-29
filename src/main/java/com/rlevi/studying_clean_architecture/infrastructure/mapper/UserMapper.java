@@ -3,6 +3,7 @@ package com.rlevi.studying_clean_architecture.infrastructure.mapper;
 import com.rlevi.studying_clean_architecture.core.entities.User;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginRequest;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.register.UserRegisterRequest;
+import com.rlevi.studying_clean_architecture.infrastructure.dto.response.UserResponse;
 import com.rlevi.studying_clean_architecture.infrastructure.persistence.UserEntity;
 import org.springframework.stereotype.Component;
 
@@ -75,5 +76,41 @@ public class UserMapper {
         if (user.passwordHash() != null && !user.passwordHash().isBlank()) {
             entity.setPasswordHash(user.passwordHash());
         }
+    }
+
+    /**
+     * Converts from User domain entity to UserResponse DTO
+     */
+    public UserResponse toResponse(User user) {
+        if (user == null) {
+            return null;
+        }
+        
+        return new UserResponse(
+                user.id(),
+                user.email(),
+                user.name(),
+                user.role(),
+                null, // These fields will be filled in by the controller
+                null
+        );
+    }
+
+    /**
+     * Converts from UserEntity to UserResponse DTO
+     */
+    public UserResponse toResponse(UserEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        
+        return new UserResponse(
+                entity.getId(),
+                entity.getEmail(),
+                entity.getName(),
+                entity.getRole(),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt()
+        );
     }
 }
