@@ -19,7 +19,9 @@ public class UserMapper {
                 dto.email(),
                 dto.name(),
                 dto.password(),
-                null // Role will be set in the use case
+                null, // Role will be set in the use case
+                null,
+                null
         );
     }
 
@@ -32,6 +34,8 @@ public class UserMapper {
                 dto.email(),
                 null,
                 dto.password(),
+                null,
+                null,
                 null
         );
     }
@@ -46,6 +50,8 @@ public class UserMapper {
         entity.setEmail(user.email());
         entity.setPasswordHash(user.passwordHash());
         entity.setRole(user.role());
+
+        // createdAt and updatedAt are managed by JPA/Hibernate
         return entity;
     }
 
@@ -62,7 +68,9 @@ public class UserMapper {
                 entity.getEmail(),
                 entity.getName(),
                 entity.getPasswordHash(),
-                entity.getRole()
+                entity.getRole(),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt()
         );
     }
 
@@ -91,8 +99,8 @@ public class UserMapper {
                 user.email(),
                 user.name(),
                 user.role(),
-                null, // These fields will be filled in by the controller
-                null
+                user.createdAt(),
+                user.updatedAt()
         );
     }
 

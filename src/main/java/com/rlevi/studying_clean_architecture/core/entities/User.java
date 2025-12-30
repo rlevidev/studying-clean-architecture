@@ -1,12 +1,19 @@
 package com.rlevi.studying_clean_architecture.core.entities;
 
 import com.rlevi.studying_clean_architecture.core.enums.Role;
+import java.time.Instant;
 
 public record User(
         Long id,
         String email,
         String name,
         String passwordHash,
-        Role role
+        Role role,
+        Instant createdAt,
+        Instant updatedAt
 ) {
+    // Construtor auxiliar para manter compatibilidade com código existente que não passa as datas
+    public User(Long id, String email, String name, String passwordHash, Role role) {
+        this(id, email, name, passwordHash, role, null, null);
+    }
 }

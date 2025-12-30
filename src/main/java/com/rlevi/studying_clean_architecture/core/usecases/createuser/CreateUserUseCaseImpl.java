@@ -27,7 +27,9 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
             user.email(),
             user.name(),
             encryptedPassword,
-            Role.USER
+            Role.USER,
+            null,
+            null
     );
 
     return userGateway.createUser(userToSave);
