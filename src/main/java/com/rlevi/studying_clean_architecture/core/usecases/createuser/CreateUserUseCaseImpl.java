@@ -1,6 +1,7 @@
 package com.rlevi.studying_clean_architecture.core.usecases.createuser;
 
 import com.rlevi.studying_clean_architecture.core.entities.User;
+import com.rlevi.studying_clean_architecture.infrastructure.exception.DuplicateResourceException;
 import com.rlevi.studying_clean_architecture.core.enums.Role;
 import com.rlevi.studying_clean_architecture.core.gateway.UserGateway;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,7 +18,7 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
   @Override
   public User execute(User user) {
     if (userGateway.verifyExistsByEmail(user.email())) {
-      throw new IllegalArgumentException("Email já está cadastrado.");
+      throw new DuplicateResourceException("The email provided is already in use. Please use another email or log in.");
     }
 
     String encryptedPassword = passwordEncoder.encode(user.passwordHash());
