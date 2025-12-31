@@ -51,7 +51,7 @@ public class SecurityConfig {
                             "/api/v1/users/register", "/api/v1/users/login"
                     ).permitAll()
                     .requestMatchers(
-                            "/api/v1/users/all"
+                            "/api/v1/users/all", "/api/v1/users/{id}"
                     ).hasRole("ADMIN")
                     .anyRequest().authenticated())
             .exceptionHandling(ex -> ex.accessDeniedHandler(customAcessDeniedHandler)
