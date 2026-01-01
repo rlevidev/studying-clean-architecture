@@ -3,6 +3,7 @@ package com.rlevi.studying_clean_architecture.infrastructure.presentation;
 import com.rlevi.studying_clean_architecture.core.entities.User;
 import com.rlevi.studying_clean_architecture.core.usecases.createuser.CreateUserUseCase;
 import com.rlevi.studying_clean_architecture.core.usecases.findallusers.FindAllUsersUseCase;
+import com.rlevi.studying_clean_architecture.core.usecases.finduserbyemail.FindUserByEmailUseCase;
 import com.rlevi.studying_clean_architecture.core.usecases.finduserbyid.FindUserByIdUseCase;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginRequest;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginResponse;
@@ -12,6 +13,7 @@ import com.rlevi.studying_clean_architecture.infrastructure.dto.response.UserRes
 import com.rlevi.studying_clean_architecture.infrastructure.mapper.UserMapper;
 import com.rlevi.studying_clean_architecture.infrastructure.security.JwtUtil;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -31,6 +33,7 @@ public class UserController {
   private final CreateUserUseCase createUserUseCase;
   private final FindAllUsersUseCase findAllUsersUseCase;
   private final FindUserByIdUseCase findUserByIdUseCase;
+  private final FindUserByEmailUseCase findUserByEmailUseCase;
   private final UserMapper userMapper;
   private final AuthenticationManager authenticationManager;
   private final JwtUtil jwtUtil;
@@ -39,12 +42,14 @@ public class UserController {
           CreateUserUseCase createUserUseCase,
           FindAllUsersUseCase findAllUsersUseCase,
           FindUserByIdUseCase findUserByIdUseCase,
+          FindUserByEmailUseCase findUserByEmailUseCase,
           UserMapper userMapper,
           AuthenticationManager authenticationManager,
           JwtUtil jwtUtil) {
     this.createUserUseCase = createUserUseCase;
     this.findAllUsersUseCase = findAllUsersUseCase;
     this.findUserByIdUseCase = findUserByIdUseCase;
+    this.findUserByEmailUseCase = findUserByEmailUseCase;
     this.userMapper = userMapper;
     this.authenticationManager = authenticationManager;
     this.jwtUtil = jwtUtil;
@@ -96,6 +101,14 @@ public class UserController {
   @GetMapping("/{id}")
   public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
     return findUserByIdUseCase.execute(id)
+            .map(userMapper::toResponse)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+  }
+
+  @GetMapping()
+  public ResponseEntity<UserResponse> getUserByEmail(@RequestParam("email") @Email(message = "Invalid email format.") String email){
+    return findUserByEmailUseCase.execute(email)
             .map(userMapper::toResponse)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
