@@ -18,14 +18,15 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/users")
+@Validated
 public class UserController {
   private final CreateUserUseCase createUserUseCase;
   private final FindAllUsersUseCase findAllUsersUseCase;
@@ -94,10 +95,9 @@ public class UserController {
 
   @GetMapping("/{id}")
   public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
-    Optional<User> user = findUserByIdUseCase.execute(id);
-    UserResponse response = user.map(userMapper::toResponse)
-            .orElse(null);
-
-    return ResponseEntity.ok(response);
+    return findUserByIdUseCase.execute(id)
+            .map(userMapper::toResponse)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
   }
 }
