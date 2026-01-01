@@ -15,6 +15,7 @@ import com.rlevi.studying_clean_architecture.infrastructure.security.JwtUtil;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -89,6 +90,7 @@ public class UserController {
   }
 
   @GetMapping("/all")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<List<UserResponse>> getAllUsers() {
     List<User> users = findAllUsersUseCase.execute();
     List<UserResponse> response = users.stream()
@@ -99,6 +101,7 @@ public class UserController {
   }
 
   @GetMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
     return findUserByIdUseCase.execute(id)
             .map(userMapper::toResponse)
@@ -107,6 +110,7 @@ public class UserController {
   }
 
   @GetMapping()
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<UserResponse> getUserByEmail(@RequestParam("email") @Email(message = "Invalid email format.") String email){
     return findUserByEmailUseCase.execute(email)
             .map(userMapper::toResponse)
