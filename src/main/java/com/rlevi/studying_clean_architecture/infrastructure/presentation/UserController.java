@@ -10,6 +10,7 @@ import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginR
 import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginResponse;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.register.UserRegisterRequest;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.register.UserRegisterResponse;
+import com.rlevi.studying_clean_architecture.infrastructure.dto.response.UserExistsResponse;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.response.UserResponse;
 import com.rlevi.studying_clean_architecture.infrastructure.mapper.UserMapper;
 import com.rlevi.studying_clean_architecture.infrastructure.security.JwtUtil;
@@ -124,9 +125,19 @@ public class UserController {
 
   @GetMapping("/verify-exists")
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<Boolean> checkExists(@RequestParam("email") @Email(message = "Invalid email format.") String email){
+  public ResponseEntity<UserExistsResponse> checkExists(@RequestParam("email") @Email(message = "Invalid email format.") String email){
     boolean exists = verifyExistsByEmailUseCase.execute(email);
 
-    return ResponseEntity.ok(exists);
+    if (!exists) {
+      return ResponseEntity.notFound().build();
+    }
+
+    return findUserByEmailUseCase.execute(email)
+            .map(user -> {
+              UserResponse userResponse = userMapper.toResponse(user);
+              return new UserExistsResponse("User found", userResponse);
+            })
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
   }
 }
