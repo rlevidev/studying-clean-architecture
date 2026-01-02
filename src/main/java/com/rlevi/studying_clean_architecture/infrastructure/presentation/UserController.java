@@ -5,6 +5,7 @@ import com.rlevi.studying_clean_architecture.core.usecases.createuser.CreateUser
 import com.rlevi.studying_clean_architecture.core.usecases.findallusers.FindAllUsersUseCase;
 import com.rlevi.studying_clean_architecture.core.usecases.finduserbyemail.FindUserByEmailUseCase;
 import com.rlevi.studying_clean_architecture.core.usecases.finduserbyid.FindUserByIdUseCase;
+import com.rlevi.studying_clean_architecture.core.usecases.verifyexistsbyemail.VerifyExistsByEmailUseCase;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginRequest;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginResponse;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.register.UserRegisterRequest;
@@ -35,6 +36,7 @@ public class UserController {
   private final FindAllUsersUseCase findAllUsersUseCase;
   private final FindUserByIdUseCase findUserByIdUseCase;
   private final FindUserByEmailUseCase findUserByEmailUseCase;
+  private final VerifyExistsByEmailUseCase verifyExistsByEmailUseCase;
   private final UserMapper userMapper;
   private final AuthenticationManager authenticationManager;
   private final JwtUtil jwtUtil;
@@ -44,6 +46,7 @@ public class UserController {
           FindAllUsersUseCase findAllUsersUseCase,
           FindUserByIdUseCase findUserByIdUseCase,
           FindUserByEmailUseCase findUserByEmailUseCase,
+          VerifyExistsByEmailUseCase verifyExistsByEmailUseCase,
           UserMapper userMapper,
           AuthenticationManager authenticationManager,
           JwtUtil jwtUtil) {
@@ -51,6 +54,7 @@ public class UserController {
     this.findAllUsersUseCase = findAllUsersUseCase;
     this.findUserByIdUseCase = findUserByIdUseCase;
     this.findUserByEmailUseCase = findUserByEmailUseCase;
+    this.verifyExistsByEmailUseCase = verifyExistsByEmailUseCase;
     this.userMapper = userMapper;
     this.authenticationManager = authenticationManager;
     this.jwtUtil = jwtUtil;
@@ -116,5 +120,13 @@ public class UserController {
             .map(userMapper::toResponse)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
+  }
+
+  @GetMapping("/verify-exists")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<Boolean> checkExists(@RequestParam("email") @Email(message = "Invalid email format.") String email){
+    boolean exists = verifyExistsByEmailUseCase.execute(email);
+
+    return ResponseEntity.ok(exists);
   }
 }
