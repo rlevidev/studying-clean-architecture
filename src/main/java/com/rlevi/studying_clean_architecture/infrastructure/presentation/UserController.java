@@ -100,6 +100,7 @@ public class UserController {
     return ResponseEntity.ok(UserLoginResponse.success(token));
   }
 
+  // Get all users
   @GetMapping("/all")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<List<UserResponse>> getAllUsers() {
@@ -111,6 +112,7 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
+  // Get user by id
   @GetMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
@@ -120,6 +122,7 @@ public class UserController {
             .orElse(ResponseEntity.notFound().build());
   }
 
+  // Get user by email
   @GetMapping()
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<UserResponse> getUserByEmail(@RequestParam("email") @Email(message = "Invalid email format.") String email){
@@ -129,6 +132,7 @@ public class UserController {
             .orElse(ResponseEntity.notFound().build());
   }
 
+  // Verify if user exists by email
   @GetMapping("/verify-exists")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<UserExistsResponse> checkExists(@RequestParam("email") @Email(message = "Invalid email format.") String email){
@@ -146,7 +150,8 @@ public class UserController {
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
   }
-  
+
+  // Delete user by id
   @DeleteMapping("/delete-user")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Map<String, String>> deleteUser(@RequestParam("id") @NotNull Long id){
