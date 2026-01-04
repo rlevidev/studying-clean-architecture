@@ -4,6 +4,7 @@ import com.rlevi.studying_clean_architecture.core.entities.User;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginRequest;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.register.UserRegisterRequest;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.response.UserResponse;
+import com.rlevi.studying_clean_architecture.infrastructure.dto.update.UserUpdateRequest;
 import com.rlevi.studying_clean_architecture.infrastructure.persistence.UserEntity;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +36,21 @@ public class UserMapper {
                 null,
                 dto.password(),
                 null,
+                null,
+                null
+        );
+    }
+
+    /**
+     * Converts from UserUpdateRequest to User domain entity
+     */
+    public User toDomain(Long id, UserUpdateRequest dto) {
+        return new User(
+                id,
+                dto.email(),
+                dto.name(),
+                dto.password(),
+                null, // Role will be preserved in the use case
                 null,
                 null
         );
@@ -78,9 +94,15 @@ public class UserMapper {
      * Updates an existing entity with domain data
      */
     public void updateEntityFromDomain(User user, UserEntity entity) {
-        entity.setName(user.name());
-        entity.setEmail(user.email());
-        entity.setRole(user.role());
+        if (user.name() != null) {
+            entity.setName(user.name());
+        }
+        if (user.email() != null) {
+            entity.setEmail(user.email());
+        }
+        if (user.role() != null) {
+            entity.setRole(user.role());
+        }
         if (user.passwordHash() != null && !user.passwordHash().isBlank()) {
             entity.setPasswordHash(user.passwordHash());
         }

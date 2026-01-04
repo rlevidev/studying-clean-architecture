@@ -6,6 +6,7 @@ import com.rlevi.studying_clean_architecture.core.usecases.deleteuser.DeleteUser
 import com.rlevi.studying_clean_architecture.core.usecases.findallusers.FindAllUsersUseCase;
 import com.rlevi.studying_clean_architecture.core.usecases.finduserbyemail.FindUserByEmailUseCase;
 import com.rlevi.studying_clean_architecture.core.usecases.finduserbyid.FindUserByIdUseCase;
+import com.rlevi.studying_clean_architecture.core.usecases.updateuser.UpdateUserUseCase;
 import com.rlevi.studying_clean_architecture.core.usecases.verifyexistsbyemail.VerifyExistsByEmailUseCase;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginRequest;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginResponse;
@@ -13,6 +14,7 @@ import com.rlevi.studying_clean_architecture.infrastructure.dto.register.UserReg
 import com.rlevi.studying_clean_architecture.infrastructure.dto.register.UserRegisterResponse;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.response.UserExistsResponse;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.response.UserResponse;
+import com.rlevi.studying_clean_architecture.infrastructure.dto.update.UserUpdateRequest;
 import com.rlevi.studying_clean_architecture.infrastructure.mapper.UserMapper;
 import com.rlevi.studying_clean_architecture.infrastructure.security.JwtUtil;
 import jakarta.validation.Valid;
@@ -42,6 +44,7 @@ public class UserController {
   private final FindUserByEmailUseCase findUserByEmailUseCase;
   private final VerifyExistsByEmailUseCase verifyExistsByEmailUseCase;
   private final DeleteUserUseCase deleteUserUseCase;
+  private final UpdateUserUseCase updateUserUseCase;
   private final UserMapper userMapper;
   private final AuthenticationManager authenticationManager;
   private final JwtUtil jwtUtil;
@@ -53,6 +56,7 @@ public class UserController {
           FindUserByEmailUseCase findUserByEmailUseCase,
           VerifyExistsByEmailUseCase verifyExistsByEmailUseCase,
           DeleteUserUseCase deleteUserUseCase,
+          UpdateUserUseCase updateUserUseCase,
           UserMapper userMapper,
           AuthenticationManager authenticationManager,
           JwtUtil jwtUtil) {
@@ -62,6 +66,7 @@ public class UserController {
     this.findUserByEmailUseCase = findUserByEmailUseCase;
     this.verifyExistsByEmailUseCase = verifyExistsByEmailUseCase;
     this.deleteUserUseCase = deleteUserUseCase;
+    this.updateUserUseCase = updateUserUseCase;
     this.userMapper = userMapper;
     this.authenticationManager = authenticationManager;
     this.jwtUtil = jwtUtil;
@@ -150,12 +155,21 @@ public class UserController {
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
   }
-
+  
   // Delete user by id
   @DeleteMapping("/delete-user")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Map<String, String>> deleteUser(@RequestParam("id") @NotNull Long id){
     deleteUserUseCase.execute(id);
     return ResponseEntity.ok(Map.of("message", "User deleted successfully"));
+  }
+
+  // Update user
+  @PutMapping("/update")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<UserResponse> updateUser(@RequestParam("id") @NotNull Long id, @Valid @RequestBody UserUpdateRequest request) {
+    User userToUpdate = userMapper.toDomain(id, request);
+    User updatedUser = updateUserUseCase.execute(userToUpdate);
+    return ResponseEntity.ok(userMapper.toResponse(updatedUser));
   }
 }
