@@ -8,6 +8,7 @@ import com.rlevi.studying_clean_architecture.core.usecases.finduserbyemail.FindU
 import com.rlevi.studying_clean_architecture.core.usecases.finduserbyid.FindUserByIdUseCase;
 import com.rlevi.studying_clean_architecture.core.usecases.updateuser.UpdateUserUseCase;
 import com.rlevi.studying_clean_architecture.core.usecases.verifyexistsbyemail.VerifyExistsByEmailUseCase;
+import com.rlevi.studying_clean_architecture.core.usecases.loginuser.LoginUserUseCase;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginRequest;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.login.UserLoginResponse;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.register.UserRegisterRequest;
@@ -45,6 +46,7 @@ public class UserController {
   private final VerifyExistsByEmailUseCase verifyExistsByEmailUseCase;
   private final DeleteUserUseCase deleteUserUseCase;
   private final UpdateUserUseCase updateUserUseCase;
+  private final LoginUserUseCase loginUserUseCase;
   private final UserMapper userMapper;
   private final AuthenticationManager authenticationManager;
   private final JwtUtil jwtUtil;
@@ -57,6 +59,7 @@ public class UserController {
           VerifyExistsByEmailUseCase verifyExistsByEmailUseCase,
           DeleteUserUseCase deleteUserUseCase,
           UpdateUserUseCase updateUserUseCase,
+          LoginUserUseCase loginUserUseCase,
           UserMapper userMapper,
           AuthenticationManager authenticationManager,
           JwtUtil jwtUtil) {
@@ -67,6 +70,7 @@ public class UserController {
     this.verifyExistsByEmailUseCase = verifyExistsByEmailUseCase;
     this.deleteUserUseCase = deleteUserUseCase;
     this.updateUserUseCase = updateUserUseCase;
+    this.loginUserUseCase = loginUserUseCase;
     this.userMapper = userMapper;
     this.authenticationManager = authenticationManager;
     this.jwtUtil = jwtUtil;
@@ -85,23 +89,15 @@ public class UserController {
   // User login
   @PostMapping("/login")
   public ResponseEntity<UserLoginResponse> loginUser(@Valid @RequestBody UserLoginRequest request) {
-    Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.email(), request.password())
-    );
-
-    if (!authentication.isAuthenticated()) {
-      throw new BadCredentialsException("Authentication failed");
-    }
+    User userToLogin = userMapper.toDomain(request);
+    User authenticatedUser = loginUserUseCase.execute(userToLogin);
 
     // Gets the role of the authenticated user
-    String role = authentication.getAuthorities().stream()
-            .findFirst()
-            .map(GrantedAuthority::getAuthority)
-            .orElse("ROLE_USER");
-    
+    String role = authenticatedUser.role().name();
+
     // Generates the JWT token
     String token = jwtUtil.generateToken(request.email(), role);
-    
+
     return ResponseEntity.ok(UserLoginResponse.success(token));
   }
 

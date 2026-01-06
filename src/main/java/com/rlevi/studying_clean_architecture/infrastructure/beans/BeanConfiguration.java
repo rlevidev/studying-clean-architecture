@@ -16,6 +16,8 @@ import com.rlevi.studying_clean_architecture.core.usecases.updateuser.UpdateUser
 import com.rlevi.studying_clean_architecture.core.usecases.updateuser.UpdateUserUseCaseImpl;
 import com.rlevi.studying_clean_architecture.core.usecases.verifyexistsbyemail.VerifyExistsByEmailUseCase;
 import com.rlevi.studying_clean_architecture.core.usecases.verifyexistsbyemail.VerifyExistsByEmailUseCaseImpl;
+import com.rlevi.studying_clean_architecture.core.usecases.loginuser.LoginUserUseCase;
+import com.rlevi.studying_clean_architecture.core.usecases.loginuser.LoginUserUseCaseImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,6 +27,11 @@ public class BeanConfiguration {
   @Bean
   public CreateUserUseCase createUserUseCase(UserGateway userGateway, PasswordEncoderGateway passwordEncoderGateway) {
     return new CreateUserUseCaseImpl(userGateway, passwordEncoderGateway);
+  }
+
+  @Bean
+  public LoginUserUseCase loginUserUseCase(UserGateway userGateway, PasswordEncoderGateway passwordEncoderGateway) {
+    return new LoginUserUseCaseImpl(userGateway, passwordEncoderGateway);
   }
 
   @Bean
