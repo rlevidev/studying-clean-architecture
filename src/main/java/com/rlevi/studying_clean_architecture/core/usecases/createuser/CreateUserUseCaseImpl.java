@@ -4,15 +4,15 @@ import com.rlevi.studying_clean_architecture.core.entities.User;
 import com.rlevi.studying_clean_architecture.infrastructure.exception.DuplicateResourceException;
 import com.rlevi.studying_clean_architecture.core.enums.Role;
 import com.rlevi.studying_clean_architecture.core.gateway.UserGateway;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.rlevi.studying_clean_architecture.core.gateway.PasswordEncoderGateway;
 
 public class CreateUserUseCaseImpl implements CreateUserUseCase {
   private final UserGateway userGateway;
-  private final PasswordEncoder passwordEncoder;
+  private final PasswordEncoderGateway passwordEncoderGateway;
 
-  public CreateUserUseCaseImpl(UserGateway userGateway, PasswordEncoder passwordEncoder) {
+  public CreateUserUseCaseImpl(UserGateway userGateway, PasswordEncoderGateway passwordEncoderGateway) {
     this.userGateway = userGateway;
-    this.passwordEncoder = passwordEncoder;
+    this.passwordEncoderGateway = passwordEncoderGateway;
   }
 
   @Override
@@ -21,7 +21,7 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
       throw new DuplicateResourceException("The email provided is already in use. Please use another email or log in.");
     }
 
-    String encryptedPassword = passwordEncoder.encode(user.passwordHash());
+    String encryptedPassword = passwordEncoderGateway.encode(user.passwordHash());
     
     var userToSave = new User(
             null,

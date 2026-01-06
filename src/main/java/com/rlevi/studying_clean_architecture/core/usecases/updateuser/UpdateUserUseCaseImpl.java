@@ -2,16 +2,16 @@ package com.rlevi.studying_clean_architecture.core.usecases.updateuser;
 
 import com.rlevi.studying_clean_architecture.core.entities.User;
 import com.rlevi.studying_clean_architecture.core.gateway.UserGateway;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.rlevi.studying_clean_architecture.core.gateway.PasswordEncoderGateway;
 
 public class UpdateUserUseCaseImpl implements UpdateUserUseCase {
   private final UserGateway userGateway;
-  private final PasswordEncoder passwordEncoder;
+  private final PasswordEncoderGateway passwordEncoderGateway;
 
 
-  public UpdateUserUseCaseImpl(UserGateway userGateway, PasswordEncoder passwordEncoder) {
+  public UpdateUserUseCaseImpl(UserGateway userGateway, PasswordEncoderGateway passwordEncoderGateway) {
     this.userGateway = userGateway;
-    this.passwordEncoder = passwordEncoder;
+    this.passwordEncoderGateway = passwordEncoderGateway;
   }
 
   @Override
@@ -37,7 +37,7 @@ public class UpdateUserUseCaseImpl implements UpdateUserUseCase {
 
     String passwordHash = existingUser.passwordHash();
     if (user.passwordHash() != null && !user.passwordHash().isBlank()) {
-      passwordHash = passwordEncoder.encode(user.passwordHash());
+      passwordHash = passwordEncoderGateway.encode(user.passwordHash());
     }
 
     User updatedUser = new User(

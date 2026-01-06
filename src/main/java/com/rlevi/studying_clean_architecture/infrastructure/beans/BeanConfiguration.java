@@ -1,6 +1,7 @@
 package com.rlevi.studying_clean_architecture.infrastructure.beans;
 
 import com.rlevi.studying_clean_architecture.core.gateway.UserGateway;
+import com.rlevi.studying_clean_architecture.core.gateway.PasswordEncoderGateway;
 import com.rlevi.studying_clean_architecture.core.usecases.createuser.CreateUserUseCase;
 import com.rlevi.studying_clean_architecture.core.usecases.createuser.CreateUserUseCaseImpl;
 import com.rlevi.studying_clean_architecture.core.usecases.deleteuser.DeleteUserUseCase;
@@ -17,19 +18,18 @@ import com.rlevi.studying_clean_architecture.core.usecases.verifyexistsbyemail.V
 import com.rlevi.studying_clean_architecture.core.usecases.verifyexistsbyemail.VerifyExistsByEmailUseCaseImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class BeanConfiguration {
 
   @Bean
-  public CreateUserUseCase createUserUseCase(UserGateway userGateway, PasswordEncoder passwordEncoder) {
-    return new CreateUserUseCaseImpl(userGateway, passwordEncoder);
+  public CreateUserUseCase createUserUseCase(UserGateway userGateway, PasswordEncoderGateway passwordEncoderGateway) {
+    return new CreateUserUseCaseImpl(userGateway, passwordEncoderGateway);
   }
 
   @Bean
-  public UpdateUserUseCase updateUserUseCase(UserGateway userGateway, PasswordEncoder passwordEncoder) {
-    return new UpdateUserUseCaseImpl(userGateway, passwordEncoder);
+  public UpdateUserUseCase updateUserUseCase(UserGateway userGateway, PasswordEncoderGateway passwordEncoderGateway) {
+    return new UpdateUserUseCaseImpl(userGateway, passwordEncoderGateway);
   }
 
   @Bean
