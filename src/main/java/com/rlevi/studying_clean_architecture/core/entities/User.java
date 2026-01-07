@@ -14,8 +14,4 @@ public record User(
         Instant createdAt,
         Instant updatedAt
 ) {
-    public User {
-        DomainValidator.validateEmail(email);
-        DomainValidator.validateName(name);
-    }
 }
