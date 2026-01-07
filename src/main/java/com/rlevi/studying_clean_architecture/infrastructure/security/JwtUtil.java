@@ -6,7 +6,9 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Component
@@ -17,28 +19,31 @@ public class JwtUtil {
   @Value("${jwt.expiration}")
   private Long expiration;
 
-  private Key getSigningKey() {
+  private SecretKey getSigningKey() {
     return Keys.hmacShaKeyFor(secret.getBytes());
   }
 
   public String generateToken(String username, String role) {
     String roleSemPrefix = role.replace("ROLE_", "");
 
+    Instant now = Instant.now();
+    Instant expirationTime = now.plus(expiration, ChronoUnit.MILLIS);
+
     return Jwts.builder()
-            .setSubject(username)
+            .subject(username)
             .claim("role", roleSemPrefix)
-            .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + expiration))
+            .issuedAt(Date.from(now))
+            .expiration(Date.from(expirationTime))
             .signWith(getSigningKey())
             .compact();
   }
 
   public Claims extractClaims(String token) {
-    return Jwts.parserBuilder()
-            .setSigningKey(getSigningKey())
+    return Jwts.parser()
+            .verifyWith(getSigningKey())
             .build()
-            .parseClaimsJws(token)
-            .getBody();
+            .parseSignedClaims(token)
+            .getPayload();
   }
 
   public String extractUsername(String token) {
