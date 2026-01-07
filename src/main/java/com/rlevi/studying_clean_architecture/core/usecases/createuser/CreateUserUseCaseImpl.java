@@ -1,7 +1,7 @@
 package com.rlevi.studying_clean_architecture.core.usecases.createuser;
 
 import com.rlevi.studying_clean_architecture.core.entities.User;
-import com.rlevi.studying_clean_architecture.infrastructure.exception.DuplicateResourceException;
+import com.rlevi.studying_clean_architecture.core.exception.UserAlreadyExistsException;
 import com.rlevi.studying_clean_architecture.core.enums.Role;
 import com.rlevi.studying_clean_architecture.core.gateway.UserGateway;
 import com.rlevi.studying_clean_architecture.core.gateway.PasswordEncoderGateway;
@@ -22,7 +22,7 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
     DomainValidator.validateName(user.name());
 
     if (userGateway.verifyExistsByEmail(user.email())) {
-      throw new DuplicateResourceException("The email provided is already in use. Please use another email or log in.");
+      throw new UserAlreadyExistsException("The email provided is already in use. Please use another email or log in.");
     }
 
     String encryptedPassword = passwordEncoderGateway.encode(user.passwordHash());

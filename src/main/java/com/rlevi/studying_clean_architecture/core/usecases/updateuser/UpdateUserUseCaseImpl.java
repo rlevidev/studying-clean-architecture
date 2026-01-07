@@ -1,6 +1,7 @@
 package com.rlevi.studying_clean_architecture.core.usecases.updateuser;
 
 import com.rlevi.studying_clean_architecture.core.entities.User;
+import com.rlevi.studying_clean_architecture.core.exception.UserNotFoundException;
 import com.rlevi.studying_clean_architecture.core.gateway.UserGateway;
 import com.rlevi.studying_clean_architecture.core.gateway.PasswordEncoderGateway;
 
@@ -17,13 +18,13 @@ public class UpdateUserUseCaseImpl implements UpdateUserUseCase {
   @Override
   public User execute(User user) {
     if (user == null) {
-      throw new IllegalArgumentException("User cannot be null.");
+      throw new UserNotFoundException("User cannot be null.");
     } else if (user.id() == null) {
-      throw new IllegalArgumentException("User ID is required for update");
+      throw new UserNotFoundException("User ID is required for update");
     }
 
     var existingUser = userGateway.findUserById(user.id())
-            .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + user.id()));
+            .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + user.id()));
 
     String name = existingUser.name();
     if (user.name() != null && !user.name().isBlank()) {
