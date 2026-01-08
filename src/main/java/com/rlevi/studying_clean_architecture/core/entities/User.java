@@ -1,7 +1,6 @@
 package com.rlevi.studying_clean_architecture.core.entities;
 
 import com.rlevi.studying_clean_architecture.core.enums.Role;
-import com.rlevi.studying_clean_architecture.core.utils.DomainValidator;
 
 import java.time.Instant;
 
