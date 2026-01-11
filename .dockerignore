@@ -1,0 +1,10 @@
+target
+.git
+.mvn
+.idea
+.vscode
+mvnw
+mvnw.cmd
+*.md
+docs
+help.md

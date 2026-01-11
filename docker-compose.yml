@@ -1,22 +1,45 @@
 version: '3.8'
-
 services:
-  postgres:
-    image: postgres:15-alpine
+  clean_arch_db:
+    image: docker.io/library/postgres:15
     container_name: clean_arch_db
     environment:
-      POSTGRES_DB: clean_arch_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=clean_arch_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - clean_arch_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
 
+  clean_arch:
+    build: .
+    container_name: clean_arch
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://clean_arch_db:5432/clean_arch_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - JWT_SECRET=your-256-bit-secret-key-here-change-this-in-production
+      - JWT_EXPIRATION=86400000
+    ports:
+      - "8080:8080"
+    depends_on:
+      clean_arch_db:
+        condition: service_healthy
+    networks:
+      - clean_arch_network
+    restart: unless-stopped
+
 volumes:
   postgres_data:
+
+networks:
+  clean_arch_network:
+    driver: bridge
