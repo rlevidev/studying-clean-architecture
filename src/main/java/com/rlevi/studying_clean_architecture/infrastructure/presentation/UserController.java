@@ -132,10 +132,25 @@ public class UserController {
   @GetMapping("/all")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<List<UserResponse>> getAllUsers() {
+    LoggerUtils.startRequest(logger, "GET /api/v1/users/all", null);
+
+    // Log of entrace
+    LoggerUtils.logAccess(logger, "GET /api/v1/users/all", true, "ADMIN");
+
+    // Log of init operation
+    LoggerUtils.logDebug(logger, "Getting all users", null);
+
+    // Business logic execution
     List<User> users = findAllUsersUseCase.execute();
     List<UserResponse> response = users.stream()
             .map(userMapper::toResponse)
             .collect(Collectors.toList());
+
+    // Log of success
+    LoggerUtils.logSuccess(logger, "Users retrieved successfully",
+        Map.of("count", users.size()));
+
+    LoggerUtils.endRequest(logger);
 
     return ResponseEntity.ok(response);
   }
