@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -159,10 +160,34 @@ public class UserController {
   @GetMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
-    return findUserByIdUseCase.execute(id)
-            .map(userMapper::toResponse)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+    LoggerUtils.startRequest(logger, "GET /api/v1/users/" + id, null);
+    
+    // Log of access to protected resource
+    LoggerUtils.logAccess(logger, "/api/v1/users/" + id, true, "ADMIN");
+    
+    // Log of operation start
+    LoggerUtils.logDebug(logger, "Getting user by ID", Map.of("userId", id));
+    
+    // Business logic execution
+    Optional<User> userOptional = findUserByIdUseCase.execute(id);
+    
+    if (userOptional.isPresent()) {
+      User user = userOptional.get();
+      UserResponse userResponse = userMapper.toResponse(user);
+      
+      // Success log
+      LoggerUtils.logSuccess(logger, "User found by ID",
+          Map.of("userId", user.id(), "email", user.email()));
+      
+      LoggerUtils.endRequest(logger);
+      return ResponseEntity.ok(userResponse);
+    } else {
+      // User not found log
+      LoggerUtils.logWarning(logger, "User not found by ID", Map.of("userId", id));
+      
+      LoggerUtils.endRequest(logger);
+      return ResponseEntity.notFound().build();
+    }
   }
 
   // Get user by email
