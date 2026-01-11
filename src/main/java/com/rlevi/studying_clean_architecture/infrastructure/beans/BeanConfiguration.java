@@ -18,8 +18,10 @@ import com.rlevi.studying_clean_architecture.core.usecases.verifyexistsbyemail.V
 import com.rlevi.studying_clean_architecture.core.usecases.verifyexistsbyemail.VerifyExistsByEmailUseCaseImpl;
 import com.rlevi.studying_clean_architecture.core.usecases.loginuser.LoginUserUseCase;
 import com.rlevi.studying_clean_architecture.core.usecases.loginuser.LoginUserUseCaseImpl;
+import com.rlevi.studying_clean_architecture.infrastructure.gateway.BCryptPasswordEncoderGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class BeanConfiguration {
@@ -62,5 +64,10 @@ public class BeanConfiguration {
   @Bean
   public DeleteUserUseCase deleteUserUseCase(UserGateway userGateway) {
     return new DeleteUserUseCaseImpl(userGateway);
+  }
+
+  @Bean
+  public PasswordEncoderGateway passwordEncoderGateway(PasswordEncoder passwordEncoder) {
+    return new BCryptPasswordEncoderGateway(passwordEncoder);
   }
 }
