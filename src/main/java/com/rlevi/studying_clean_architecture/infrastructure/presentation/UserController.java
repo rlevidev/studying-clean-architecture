@@ -18,6 +18,8 @@ import com.rlevi.studying_clean_architecture.infrastructure.dto.response.UserRes
 import com.rlevi.studying_clean_architecture.infrastructure.dto.update.UserUpdateRequest;
 import com.rlevi.studying_clean_architecture.infrastructure.mapper.UserMapper;
 import com.rlevi.studying_clean_architecture.infrastructure.security.JwtUtil;
+import com.rlevi.studying_clean_architecture.core.utils.LoggerUtils;
+import org.slf4j.Logger;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -39,6 +41,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/users")
 @Validated
 public class UserController {
+  private static final Logger logger = LoggerUtils.getLogger(UserController.class);
+  
   private final CreateUserUseCase createUserUseCase;
   private final FindAllUsersUseCase findAllUsersUseCase;
   private final FindUserByIdUseCase findUserByIdUseCase;
@@ -79,16 +83,38 @@ public class UserController {
   // Create user
   @PostMapping("/register")
   public ResponseEntity<UserRegisterResponse> registerUser(@Valid @RequestBody UserRegisterRequest request) {
+    LoggerUtils.startRequest(logger, "POST /api/v1/users/register", request.email());
+    
+    // Log of entrace
+    LoggerUtils.logDebug(logger, "Registering user",
+        Map.of("email", request.email(), "name", request.name()));
+    
+    // Business logic execution
     User userToCreate = userMapper.toDomain(request);
-    createUserUseCase.execute(userToCreate);
+    User createdUser = createUserUseCase.execute(userToCreate);
+    
+    // Generates the JWT token
     String token = jwtUtil.generateToken(request.email(), "ROLE_USER");
-
+    
+    // Log of success
+    LoggerUtils.logSuccess(logger, "User registered successfully",
+        Map.of("userId", createdUser.id(), "email", createdUser.email()));
+    
+    LoggerUtils.endRequest(logger);
+    
     return ResponseEntity.ok(UserRegisterResponse.success(token));
   }
 
   // User login
   @PostMapping("/login")
   public ResponseEntity<UserLoginResponse> loginUser(@Valid @RequestBody UserLoginRequest request) {
+    LoggerUtils.startRequest(logger, "POST /api/v1/users/login", request.email());
+
+    // Log of entrace
+    LoggerUtils.logDebug(logger, "Logging in user",
+        Map.of("email", request.email()));
+
+    // Business logic execution
     User userToLogin = userMapper.toDomain(request);
     User authenticatedUser = loginUserUseCase.execute(userToLogin);
 
@@ -97,6 +123,11 @@ public class UserController {
 
     // Generates the JWT token
     String token = jwtUtil.generateToken(request.email(), role);
+
+    LoggerUtils.logSuccess(logger, "User logged in successfully",
+        Map.of("userId", authenticatedUser.id(), "email", authenticatedUser.email()));
+
+    LoggerUtils.endRequest(logger);
 
     return ResponseEntity.ok(UserLoginResponse.success(token));
   }
