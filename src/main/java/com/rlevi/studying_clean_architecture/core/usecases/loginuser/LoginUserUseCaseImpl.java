@@ -17,7 +17,7 @@ public class LoginUserUseCaseImpl implements LoginUserUseCase {
 
   @Override
   public User execute(User user) {
-    if (user == null || user.email() == null || user.passwordHash() == null) {
+    if (user == null || user.email() == null || user.passwordHash() == null || user.passwordHash().isBlank()) {
       throw new AuthenticationException("Invalid email or password. Please try again.");
     }
 
