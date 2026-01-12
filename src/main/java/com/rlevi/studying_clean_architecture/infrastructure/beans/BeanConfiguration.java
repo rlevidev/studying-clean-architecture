@@ -19,8 +19,10 @@ import com.rlevi.studying_clean_architecture.core.usecases.verifyexistsbyemail.V
 import com.rlevi.studying_clean_architecture.core.usecases.loginuser.LoginUserUseCase;
 import com.rlevi.studying_clean_architecture.core.usecases.loginuser.LoginUserUseCaseImpl;
 import com.rlevi.studying_clean_architecture.infrastructure.gateway.BCryptPasswordEncoderGateway;
+import com.rlevi.studying_clean_architecture.infrastructure.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
@@ -69,5 +71,10 @@ public class BeanConfiguration {
   @Bean
   public PasswordEncoderGateway passwordEncoderGateway(PasswordEncoder passwordEncoder) {
     return new BCryptPasswordEncoderGateway(passwordEncoder);
+  }
+
+  @Bean
+  public UserDetailsService userDetailsService(UserGateway userGateway) {
+    return new CustomUserDetailsService(userGateway);
   }
 }
