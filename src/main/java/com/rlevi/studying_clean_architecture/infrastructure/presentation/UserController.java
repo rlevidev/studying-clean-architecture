@@ -82,7 +82,7 @@ public class UserController {
   public ResponseEntity<UserRegisterResponse> registerUser(@Valid @RequestBody UserRegisterRequest request) {
     LoggerUtils.startRequest(logger, "POST /api/v1/users/register", request.email());
     
-    // Log of entrace
+    // Log of entrance
     LoggerUtils.logDebug(logger, "Registering user",
         Map.of("email", request.email(), "name", request.name()));
     
@@ -107,7 +107,7 @@ public class UserController {
   public ResponseEntity<UserLoginResponse> loginUser(@Valid @RequestBody UserLoginRequest request) {
     LoggerUtils.startRequest(logger, "POST /api/v1/users/login", request.email());
 
-    // Log of entrace
+    // Log of entrance
     LoggerUtils.logDebug(logger, "Logging in user",
         Map.of("email", request.email()));
 
@@ -135,7 +135,7 @@ public class UserController {
   public ResponseEntity<List<UserResponse>> getAllUsers() {
     LoggerUtils.startRequest(logger, "GET /api/v1/users/all", null);
 
-    // Log of entrace
+    // Log of entrance
     LoggerUtils.logAccess(logger, "GET /api/v1/users/all", true, "ADMIN");
 
     // Log of init operation
