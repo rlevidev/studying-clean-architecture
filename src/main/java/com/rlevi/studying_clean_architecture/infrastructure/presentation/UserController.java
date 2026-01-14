@@ -227,19 +227,41 @@ public class UserController {
   @GetMapping("/verify-exists")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<UserExistsResponse> checkExists(@RequestParam("email") @Email(message = "Invalid email format.") String email){
+    LoggerUtils.startRequest(logger, "GET /api/v1/users/verify-exists", email);
+
+    // Log of access to protected resource
+    LoggerUtils.logAccess(logger, "/api/v1/users/verify-exists", true, "ADMIN");
+
+    // Log of operation start
+    LoggerUtils.logDebug(logger, "Checking if user exists by email", Map.of("email", email));
+
+    // Business logic execution
     boolean exists = verifyExistsByEmailUseCase.execute(email);
 
     if (!exists) {
+      LoggerUtils.logWarning(logger, "User does not exist", Map.of("email", email));
+      LoggerUtils.endRequest(logger);
       return ResponseEntity.notFound().build();
     }
 
-    return findUserByEmailUseCase.execute(email)
-            .map(user -> {
-              UserResponse userResponse = userMapper.toResponse(user);
-              return new UserExistsResponse("User found", userResponse);
-            })
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+    Optional<User> userOptional = findUserByEmailUseCase.execute(email);
+
+    if (userOptional.isPresent()) {
+      User user = userOptional.get();
+      UserResponse userResponse = userMapper.toResponse(user);
+
+      // Success log
+      LoggerUtils.logSuccess(logger, "User exists", Map.of("userId", user.id(), "email", user.email()));
+
+      LoggerUtils.endRequest(logger);
+      return ResponseEntity.ok(new UserExistsResponse("User found", userResponse));
+    } else {
+      // User not found log
+      LoggerUtils.logWarning(logger, "User not found after exists check", Map.of("email", email));
+
+      LoggerUtils.endRequest(logger);
+      return ResponseEntity.notFound().build();
+    }
   }
   
   // Delete user by id
