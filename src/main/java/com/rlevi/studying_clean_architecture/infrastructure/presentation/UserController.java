@@ -194,10 +194,33 @@ public class UserController {
   @GetMapping()
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<UserResponse> getUserByEmail(@RequestParam("email") @Email(message = "Invalid email format.") String email){
-    return findUserByEmailUseCase.execute(email)
-            .map(userMapper::toResponse)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+    LoggerUtils.startRequest(logger, "GET /api/v1/users?email=" + email, null);
+
+    // Log of access to protected resource
+    LoggerUtils.logAccess(logger, "/api/v1/users?email=" + email, true, "ADMIN");
+
+    // Log of operation start
+    LoggerUtils.logDebug(logger, "Getting user by email", Map.of("email", email));
+
+    // Business logic execution
+    Optional<User> userOptional = findUserByEmailUseCase.execute(email);
+
+    if (userOptional.isPresent()) {
+      User user = userOptional.get();
+      UserResponse userResponse = userMapper.toResponse(user);
+
+      // Success log
+      LoggerUtils.logSuccess(logger, "User found by email", Map.of("userId", user.id(), "email", user.email()));
+
+      LoggerUtils.endRequest(logger);
+      return ResponseEntity.ok(userResponse);
+    } else {
+      // User not found log
+      LoggerUtils.logWarning(logger, "User not found by email", Map.of("email", email));
+
+      LoggerUtils.endRequest(logger);
+      return ResponseEntity.notFound().build();
+    }
   }
 
   // Verify if user exists by email
