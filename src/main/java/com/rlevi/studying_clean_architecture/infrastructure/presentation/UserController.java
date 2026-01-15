@@ -268,7 +268,22 @@ public class UserController {
   @DeleteMapping("/delete-user")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Map<String, String>> deleteUser(@RequestParam("id") @NotNull Long id){
+    LoggerUtils.startRequest(logger, "DELETE /api/v1/users/delete-user?id=" + id, null);
+
+    // Log of access to protected resource
+    LoggerUtils.logAccess(logger, "/api/v1/users/delete-user", true, "ADMIN");
+
+    // Log of operation start
+    LoggerUtils.logDebug(logger, "Deleting user", Map.of("userId", id));
+
+    // Business logic execution
     deleteUserUseCase.execute(id);
+
+    // Success log
+    LoggerUtils.logSuccess(logger, "User deleted successfully", Map.of("userId", id));
+
+    LoggerUtils.endRequest(logger);
+
     return ResponseEntity.ok(Map.of("message", "User deleted successfully"));
   }
 
