@@ -291,8 +291,23 @@ public class UserController {
   @PutMapping("/update")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<UserResponse> updateUser(@RequestParam("id") @NotNull Long id, @Valid @RequestBody UserUpdateRequest request) {
+    LoggerUtils.startRequest(logger, "PUT /api/v1/users/update?id=" + id, null);
+
+    // Log of access to protected resource
+    LoggerUtils.logAccess(logger, "/api/v1/users/update", true, "ADMIN");
+
+    // Log of operation start
+    LoggerUtils.logDebug(logger, "Updating user", Map.of("userId", id));
+
+    // Business logic execution
     User userToUpdate = userMapper.toDomain(id, request);
     User updatedUser = updateUserUseCase.execute(userToUpdate);
+
+    // Success log
+    LoggerUtils.logSuccess(logger, "User updated successfully", Map.of("userId", id));
+
+    LoggerUtils.endRequest(logger);
+
     return ResponseEntity.ok(userMapper.toResponse(updatedUser));
   }
 }
