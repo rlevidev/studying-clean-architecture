@@ -20,7 +20,6 @@ public class UserMapper {
                 dto.email(),
                 dto.name(),
                 dto.password(),
-                null, // Role will be set in the use case
                 null,
                 null
         );
@@ -36,7 +35,6 @@ public class UserMapper {
                 null,
                 dto.password(),
                 null,
-                null,
                 null
         );
     }
@@ -50,7 +48,6 @@ public class UserMapper {
                 dto.email(),
                 dto.name(),
                 dto.password(),
-                null, // Role will be preserved in the use case
                 null,
                 null
         );
@@ -65,7 +62,6 @@ public class UserMapper {
         entity.setName(user.name());
         entity.setEmail(user.email());
         entity.setPasswordHash(user.passwordHash());
-        entity.setRole(user.role());
 
         // createdAt and updatedAt are managed by JPA/Hibernate
         return entity;
@@ -84,7 +80,6 @@ public class UserMapper {
                 entity.getEmail(),
                 entity.getName(),
                 entity.getPasswordHash(),
-                entity.getRole(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );
@@ -99,9 +94,6 @@ public class UserMapper {
         }
         if (user.email() != null) {
             entity.setEmail(user.email());
-        }
-        if (user.role() != null) {
-            entity.setRole(user.role());
         }
         if (user.passwordHash() != null && !user.passwordHash().isBlank()) {
             entity.setPasswordHash(user.passwordHash());
@@ -120,7 +112,6 @@ public class UserMapper {
                 user.id(),
                 user.email(),
                 user.name(),
-                user.role(),
                 user.createdAt(),
                 user.updatedAt()
         );
@@ -138,7 +129,6 @@ public class UserMapper {
                 entity.getId(),
                 entity.getEmail(),
                 entity.getName(),
-                entity.getRole(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );
