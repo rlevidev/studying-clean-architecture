@@ -1,7 +1,5 @@
 package com.rlevi.studying_clean_architecture.core.entities;
 
-import com.rlevi.studying_clean_architecture.core.enums.Role;
-
 import java.time.Instant;
 
 public record User(
@@ -9,7 +7,6 @@ public record User(
         String email,
         String name,
         String passwordHash,
-        Role role,
         Instant createdAt,
         Instant updatedAt
 ) {

@@ -23,15 +23,13 @@ public class JwtUtil {
     return Keys.hmacShaKeyFor(secret.getBytes());
   }
 
-  public String generateToken(String username, String role) {
-    String roleSemPrefix = role.replace("ROLE_", "");
+  public String generateToken(String username) {
 
     Instant now = Instant.now();
     Instant expirationTime = now.plus(expiration, ChronoUnit.MILLIS);
 
     return Jwts.builder()
             .subject(username)
-            .claim("role", roleSemPrefix)
             .issuedAt(Date.from(now))
             .expiration(Date.from(expirationTime))
             .signWith(getSigningKey())
