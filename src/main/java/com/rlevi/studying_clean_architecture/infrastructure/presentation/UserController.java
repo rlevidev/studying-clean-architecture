@@ -24,7 +24,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -91,7 +90,7 @@ public class UserController {
     User createdUser = createUserUseCase.execute(userToCreate);
     
     // Generates the JWT token
-    String token = jwtUtil.generateToken(request.email(), "ROLE_USER");
+    String token = jwtUtil.generateToken(request.email());
     
     // Log of success
     LoggerUtils.logSuccess(logger, "User registered successfully",
@@ -115,11 +114,8 @@ public class UserController {
     User userToLogin = userMapper.toDomain(request);
     User authenticatedUser = loginUserUseCase.execute(userToLogin);
 
-    // Gets the role of the authenticated user
-    String role = authenticatedUser.role().name();
-
     // Generates the JWT token
-    String token = jwtUtil.generateToken(request.email(), role);
+    String token = jwtUtil.generateToken(request.email());
 
     LoggerUtils.logSuccess(logger, "User logged in successfully",
         Map.of("userId", authenticatedUser.id(), "email", authenticatedUser.email()));
@@ -131,12 +127,8 @@ public class UserController {
 
   // Get all users
   @GetMapping("/all")
-  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<List<UserResponse>> getAllUsers() {
     LoggerUtils.startRequest(logger, "GET /api/v1/users/all", null);
-
-    // Log of entrance
-    LoggerUtils.logAccess(logger, "GET /api/v1/users/all", true, "ADMIN");
 
     // Log of init operation
     LoggerUtils.logDebug(logger, "Getting all users", null);
@@ -158,12 +150,8 @@ public class UserController {
 
   // Get user by id
   @GetMapping("/{id}")
-  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
     LoggerUtils.startRequest(logger, "GET /api/v1/users/" + id, null);
-    
-    // Log of access to protected resource
-    LoggerUtils.logAccess(logger, "/api/v1/users/" + id, true, "ADMIN");
     
     // Log of operation start
     LoggerUtils.logDebug(logger, "Getting user by ID", Map.of("userId", id));
@@ -192,12 +180,8 @@ public class UserController {
 
   // Get user by email
   @GetMapping()
-  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<UserResponse> getUserByEmail(@RequestParam("email") @Email(message = "Invalid email format.") String email){
     LoggerUtils.startRequest(logger, "GET /api/v1/users?email=" + email, null);
-
-    // Log of access to protected resource
-    LoggerUtils.logAccess(logger, "/api/v1/users?email=" + email, true, "ADMIN");
 
     // Log of operation start
     LoggerUtils.logDebug(logger, "Getting user by email", Map.of("email", email));
@@ -225,12 +209,8 @@ public class UserController {
 
   // Verify if user exists by email
   @GetMapping("/verify-exists")
-  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<UserExistsResponse> checkExists(@RequestParam("email") @Email(message = "Invalid email format.") String email){
     LoggerUtils.startRequest(logger, "GET /api/v1/users/verify-exists", email);
-
-    // Log of access to protected resource
-    LoggerUtils.logAccess(logger, "/api/v1/users/verify-exists", true, "ADMIN");
 
     // Log of operation start
     LoggerUtils.logDebug(logger, "Checking if user exists by email", Map.of("email", email));
@@ -266,12 +246,8 @@ public class UserController {
   
   // Delete user by id
   @DeleteMapping("/delete-user")
-  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Map<String, String>> deleteUser(@RequestParam("id") @NotNull Long id){
     LoggerUtils.startRequest(logger, "DELETE /api/v1/users/delete-user?id=" + id, null);
-
-    // Log of access to protected resource
-    LoggerUtils.logAccess(logger, "/api/v1/users/delete-user", true, "ADMIN");
 
     // Log of operation start
     LoggerUtils.logDebug(logger, "Deleting user", Map.of("userId", id));
@@ -289,12 +265,8 @@ public class UserController {
 
   // Update user
   @PutMapping("/update")
-  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<UserResponse> updateUser(@RequestParam("id") @NotNull Long id, @Valid @RequestBody UserUpdateRequest request) {
     LoggerUtils.startRequest(logger, "PUT /api/v1/users/update?id=" + id, null);
-
-    // Log of access to protected resource
-    LoggerUtils.logAccess(logger, "/api/v1/users/update", true, "ADMIN");
 
     // Log of operation start
     LoggerUtils.logDebug(logger, "Updating user", Map.of("userId", id));

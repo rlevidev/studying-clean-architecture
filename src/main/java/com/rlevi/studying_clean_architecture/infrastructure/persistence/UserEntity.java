@@ -1,6 +1,5 @@
 package com.rlevi.studying_clean_architecture.infrastructure.persistence;
 
-import com.rlevi.studying_clean_architecture.core.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -27,10 +26,6 @@ public class UserEntity {
 
   @Column(name = "password_hash", nullable = false)
   private String passwordHash;
-
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private Role role = Role.USER;
 
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)

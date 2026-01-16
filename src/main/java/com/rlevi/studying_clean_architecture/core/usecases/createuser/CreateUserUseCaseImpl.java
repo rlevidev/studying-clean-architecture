@@ -2,7 +2,6 @@ package com.rlevi.studying_clean_architecture.core.usecases.createuser;
 
 import com.rlevi.studying_clean_architecture.core.entities.User;
 import com.rlevi.studying_clean_architecture.core.exception.UserAlreadyExistsException;
-import com.rlevi.studying_clean_architecture.core.enums.Role;
 import com.rlevi.studying_clean_architecture.core.gateway.UserGateway;
 import com.rlevi.studying_clean_architecture.core.gateway.PasswordEncoderGateway;
 import com.rlevi.studying_clean_architecture.core.utils.DomainValidator;
@@ -32,7 +31,6 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
             user.email(),
             user.name(),
             encryptedPassword,
-            Role.USER,
             null,
             null
     );

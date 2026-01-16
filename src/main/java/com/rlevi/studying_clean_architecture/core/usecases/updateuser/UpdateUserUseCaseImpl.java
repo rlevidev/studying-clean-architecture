@@ -46,7 +46,6 @@ public class UpdateUserUseCaseImpl implements UpdateUserUseCase {
             email,
             name,
             passwordHash,
-            existingUser.role(),
             existingUser.createdAt(),
             existingUser.updatedAt()
     );
