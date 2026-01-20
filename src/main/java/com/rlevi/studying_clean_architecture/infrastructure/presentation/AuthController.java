@@ -53,7 +53,7 @@ public class AuthController {
     User createdUser = createUserUseCase.execute(userToCreate);
 
     // Generates the JWT token
-    String token = jwtUtil.generateToken(request.email());
+    String token = jwtUtil.generateAccessToken(request.email());
 
     // Log of success
     LoggerUtils.logSuccess(logger, "User registered successfully",
@@ -78,7 +78,7 @@ public class AuthController {
     User authenticatedUser = loginUserUseCase.execute(userToLogin);
 
     // Generates the JWT token
-    String token = jwtUtil.generateToken(request.email());
+    String token = jwtUtil.generateAccessToken(request.email());
 
     LoggerUtils.logSuccess(logger, "User logged in successfully",
             Map.of("userId", authenticatedUser.id(), "email", authenticatedUser.email()));
