@@ -5,10 +5,12 @@ import com.rlevi.studying_clean_architecture.core.gateway.RefreshTokenGateway;
 import com.rlevi.studying_clean_architecture.infrastructure.mapper.RefreshTokenMapper;
 import com.rlevi.studying_clean_architecture.infrastructure.persistence.RefreshTokenEntity;
 import com.rlevi.studying_clean_architecture.infrastructure.persistence.RefreshTokenRepository;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
+@Component
 public class RefreshTokenRepositoryGateway implements RefreshTokenGateway {
   private final RefreshTokenRepository refreshTokenRepository;
   private final RefreshTokenMapper refreshTokenMapper;

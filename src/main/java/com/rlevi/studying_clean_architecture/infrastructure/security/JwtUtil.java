@@ -1,5 +1,6 @@
 package com.rlevi.studying_clean_architecture.infrastructure.security;
 
+import com.rlevi.studying_clean_architecture.core.gateway.TokenGateway;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -12,7 +13,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Component
-public class JwtUtil {
+public class JwtUtil implements TokenGateway {
   @Value("${JWT_SECRET}")
   private String secret;
 

@@ -14,5 +14,5 @@ CREATE INDEX idx_refresh_tokens_user_id ON refresh_tokens(user_id);
 CREATE INDEX idx_refresh_tokens_expiry_date ON refresh_tokens(expiry_date);
 
 -- Partial index for non-revoked tokens (used in refresh)
-CREATE INDEX idx_refresh_tokens_non_revoked ON refresh_tokens(revoked = false);
+CREATE INDEX idx_refresh_tokens_non_revoked ON refresh_tokens(revoked)
 WHERE revoked = FALSE;

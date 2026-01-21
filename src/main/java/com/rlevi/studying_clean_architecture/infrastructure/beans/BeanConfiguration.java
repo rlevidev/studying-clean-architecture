@@ -1,5 +1,6 @@
 package com.rlevi.studying_clean_architecture.infrastructure.beans;
 
+import com.rlevi.studying_clean_architecture.core.gateway.TokenGateway;
 import com.rlevi.studying_clean_architecture.core.gateway.UserGateway;
 import com.rlevi.studying_clean_architecture.core.gateway.PasswordEncoderGateway;
 import com.rlevi.studying_clean_architecture.core.usecases.createuser.CreateUserUseCase;
@@ -18,8 +19,12 @@ import com.rlevi.studying_clean_architecture.core.usecases.verifyexistsbyemail.V
 import com.rlevi.studying_clean_architecture.core.usecases.verifyexistsbyemail.VerifyExistsByEmailUseCaseImpl;
 import com.rlevi.studying_clean_architecture.core.usecases.loginuser.LoginUserUseCase;
 import com.rlevi.studying_clean_architecture.core.usecases.loginuser.LoginUserUseCaseImpl;
+import com.rlevi.studying_clean_architecture.core.usecases.refreshtoken.RefreshTokenUseCase;
+import com.rlevi.studying_clean_architecture.core.usecases.refreshtoken.RefreshTokenUseCaseImpl;
+import com.rlevi.studying_clean_architecture.core.gateway.RefreshTokenGateway;
 import com.rlevi.studying_clean_architecture.infrastructure.gateway.BCryptPasswordEncoderGateway;
 import com.rlevi.studying_clean_architecture.infrastructure.security.CustomUserDetailsService;
+import com.rlevi.studying_clean_architecture.infrastructure.security.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,13 +34,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class BeanConfiguration {
 
   @Bean
-  public CreateUserUseCase createUserUseCase(UserGateway userGateway, PasswordEncoderGateway passwordEncoderGateway) {
-    return new CreateUserUseCaseImpl(userGateway, passwordEncoderGateway);
+  public CreateUserUseCase createUserUseCase(UserGateway userGateway, PasswordEncoderGateway passwordEncoderGateway, TokenGateway tokenGateway, RefreshTokenGateway refreshTokenGateway) {
+    return new CreateUserUseCaseImpl(userGateway, passwordEncoderGateway, tokenGateway, refreshTokenGateway);
   }
 
   @Bean
-  public LoginUserUseCase loginUserUseCase(UserGateway userGateway, PasswordEncoderGateway passwordEncoderGateway) {
-    return new LoginUserUseCaseImpl(userGateway, passwordEncoderGateway);
+  public LoginUserUseCase loginUserUseCase(UserGateway userGateway, PasswordEncoderGateway passwordEncoderGateway, RefreshTokenGateway refreshTokenGateway, TokenGateway tokenGateway) {
+    return new LoginUserUseCaseImpl(userGateway, passwordEncoderGateway, refreshTokenGateway, tokenGateway);
   }
 
   @Bean
@@ -66,6 +71,11 @@ public class BeanConfiguration {
   @Bean
   public DeleteUserUseCase deleteUserUseCase(UserGateway userGateway) {
     return new DeleteUserUseCaseImpl(userGateway);
+  }
+
+  @Bean
+  public RefreshTokenUseCase refreshTokenUseCase(UserGateway userGateway, TokenGateway tokenGateway, RefreshTokenGateway refreshTokenGateway) {
+    return new RefreshTokenUseCaseImpl(userGateway, tokenGateway, refreshTokenGateway);
   }
 
   @Bean

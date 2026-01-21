@@ -50,7 +50,7 @@ public class SecurityConfig {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(
-                            "/api/v1/auth/register", "/api/v1/auth/login"
+                            "/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/refresh"
                     ).permitAll()
                     .anyRequest().authenticated())
             .exceptionHandling(ex -> ex.accessDeniedHandler(customAcessDeniedHandler)
