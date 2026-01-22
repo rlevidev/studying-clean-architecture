@@ -63,11 +63,11 @@ public class RefreshTokenUseCaseImpl implements RefreshTokenUseCase {
             null
     );
 
-    // 7. Revoke the old token and link to the new one (for traceability)
-    refreshTokenGateway.revokeByToken(refreshToken, newRefreshTokenValue);
-
-    // 8. Save the new token
+    // 7. Save the new token FIRST (required for foreign key constraint)
     RefreshToken savedRefreshToken = refreshTokenGateway.save(newRefreshToken);
+
+    // 8. Revoke the old token and link it to the new one (for traceability)
+    refreshTokenGateway.revokeByToken(refreshToken, savedRefreshToken.token());
 
     return new AuthResult(user, newAccessToken, savedRefreshToken.token());
   }
