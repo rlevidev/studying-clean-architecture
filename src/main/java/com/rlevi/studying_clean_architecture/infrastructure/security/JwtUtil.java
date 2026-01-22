@@ -14,7 +14,7 @@ import java.util.Date;
 
 @Component
 public class JwtUtil implements TokenGateway {
-  @Value("${JWT_SECRET}")
+  @Value("${jwt.secret}")
   private String secret;
 
   @Value("${jwt.access.expiration}")
