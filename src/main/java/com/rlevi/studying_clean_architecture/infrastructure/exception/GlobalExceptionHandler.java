@@ -1,5 +1,6 @@
 package com.rlevi.studying_clean_architecture.infrastructure.exception;
 
+import com.rlevi.studying_clean_architecture.core.exception.InvalidRefreshTokenException;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.ErrorResponse;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.ErrorValidation;
 import jakarta.servlet.http.HttpServletRequest;
@@ -126,6 +127,21 @@ public class GlobalExceptionHandler {
         );
 
         return new ResponseEntity<>(errorValidation, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRefreshToken(
+            InvalidRefreshTokenException ex, HttpServletRequest request) {
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.UNAUTHORIZED.value(),
+                "Invalid Refresh Token",
+                "Invalid or expired refresh token",
+                request.getRequestURI()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)
