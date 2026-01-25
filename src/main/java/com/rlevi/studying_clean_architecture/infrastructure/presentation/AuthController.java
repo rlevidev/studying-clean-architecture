@@ -88,7 +88,7 @@ public class AuthController {
   // Refresh token
   @PostMapping("/refresh")
   public ResponseEntity<RefreshTokenResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
-    LoggerUtils.startRequest(logger, "POST /api/v1/auth/refresh", "Token refresh operation");
+    LoggerUtils.startRequest(logger, "POST /api/v1/auth/refresh", null);
 
     // Log of entrance
     LoggerUtils.logDebug(logger, "Refreshing token", null);

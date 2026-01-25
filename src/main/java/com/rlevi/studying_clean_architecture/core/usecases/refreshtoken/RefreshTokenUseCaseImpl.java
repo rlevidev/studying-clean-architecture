@@ -7,7 +7,7 @@ import com.rlevi.studying_clean_architecture.core.exception.DomainException;
 import com.rlevi.studying_clean_architecture.core.gateway.RefreshTokenGateway;
 import com.rlevi.studying_clean_architecture.core.gateway.TokenGateway;
 import com.rlevi.studying_clean_architecture.core.gateway.UserGateway;
-import com.rlevi.studying_clean_architecture.infrastructure.exception.InvalidRefreshTokenException;
+import com.rlevi.studying_clean_architecture.core.exception.InvalidRefreshTokenException;
 
 import java.time.Instant;
 

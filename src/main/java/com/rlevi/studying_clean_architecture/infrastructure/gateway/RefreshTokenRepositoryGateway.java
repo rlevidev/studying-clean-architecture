@@ -8,11 +8,13 @@ import com.rlevi.studying_clean_architecture.infrastructure.persistence.RefreshT
 import com.rlevi.studying_clean_architecture.infrastructure.persistence.UserEntity;
 import com.rlevi.studying_clean_architecture.infrastructure.persistence.UserRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Component
+@Transactional
 public class RefreshTokenRepositoryGateway implements RefreshTokenGateway {
   private final RefreshTokenRepository refreshTokenRepository;
   private final UserRepository userRepository;
@@ -53,12 +55,9 @@ public class RefreshTokenRepositoryGateway implements RefreshTokenGateway {
 
   @Override
   public void revokeByToken(String token, String replacementToken) {
-    Optional<RefreshTokenEntity> optionalEntity = refreshTokenRepository.findByToken(token);
-    if (optionalEntity.isPresent()) {
-      RefreshTokenEntity entity = optionalEntity.get();
-      entity.setRevoked(true);
-      entity.setReplacedByToken(replacementToken);
-      refreshTokenRepository.save(entity);
+    int updatedRows = refreshTokenRepository.revokeAndReplaceByTokenIfNotRevoked(token, replacementToken);
+    if (updatedRows == 0) {
+      throw new IllegalStateException("Token was already revoked by another concurrent request");
     }
   }
 
