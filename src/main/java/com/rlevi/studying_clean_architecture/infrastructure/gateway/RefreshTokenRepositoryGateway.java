@@ -1,6 +1,7 @@
 package com.rlevi.studying_clean_architecture.infrastructure.gateway;
 
 import com.rlevi.studying_clean_architecture.core.entities.RefreshToken;
+import com.rlevi.studying_clean_architecture.core.exception.InvalidRefreshTokenException;
 import com.rlevi.studying_clean_architecture.core.gateway.RefreshTokenGateway;
 import com.rlevi.studying_clean_architecture.infrastructure.mapper.RefreshTokenMapper;
 import com.rlevi.studying_clean_architecture.infrastructure.persistence.RefreshTokenEntity;
@@ -57,7 +58,7 @@ public class RefreshTokenRepositoryGateway implements RefreshTokenGateway {
   public void revokeByToken(String token, String replacementToken) {
     int updatedRows = refreshTokenRepository.revokeAndReplaceByTokenIfNotRevoked(token, replacementToken);
     if (updatedRows == 0) {
-      throw new IllegalStateException("Token was already revoked by another concurrent request");
+      throw new InvalidRefreshTokenException("Refresh token already revoked");
     }
   }
 
@@ -72,7 +73,7 @@ public class RefreshTokenRepositoryGateway implements RefreshTokenGateway {
     // This prevents creating a new token when the old one is already invalid
     Optional<RefreshToken> existingToken = findByTokenAndRevokedFalse(oldToken);
     if (existingToken.isEmpty()) {
-      throw new IllegalStateException("Token is already revoked or invalid");
+      throw new InvalidRefreshTokenException("Refresh token already revoked or invalid");
     }
     
     // Save the new token first (required for foreign key constraint)
