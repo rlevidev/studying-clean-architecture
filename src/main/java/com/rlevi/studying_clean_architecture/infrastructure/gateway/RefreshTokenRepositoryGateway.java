@@ -80,7 +80,7 @@ public class RefreshTokenRepositoryGateway implements RefreshTokenGateway {
     RefreshToken savedRefreshToken = save(newRefreshToken);
     
     // Atomically revoke the old token with the replacement link
-    // This will always succeed because we already verified the token is not revoked
+    // A concurrent refresh might revoke first; in that case revokeByToken throws.
     revokeByToken(oldToken, savedRefreshToken.token());
     
     return savedRefreshToken;
