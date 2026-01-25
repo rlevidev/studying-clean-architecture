@@ -37,7 +37,14 @@ public class RefreshTokenUseCaseImpl implements RefreshTokenUseCase {
     // 3. Validate token integrity (optional, as it's already in DB, but good for security)
     // Actually, TokenGateway should probably have a validation method if we want to be strict.
     // But for now we use extractUsername which will fail if token is invalid.
-    String email = tokenGateway.extractUsername(refreshToken);
+    String email;
+    try {
+      email = tokenGateway.extractUsername(refreshToken);
+    } catch (RuntimeException jwtException) {
+      // Revoke the current token since it's malformed/invalid
+      refreshTokenGateway.revokeByToken(refreshToken, null);
+      throw new InvalidRefreshTokenException("Invalid or malformed refresh token. Please login again.");
+    }
 
     // 4. Find the associated user
     User user = userGateway.findUserByEmail(email)
@@ -48,7 +55,7 @@ public class RefreshTokenUseCaseImpl implements RefreshTokenUseCase {
       throw new InvalidRefreshTokenException("Token mismatch: Refresh token does not belong to this user.");
     }
 
-    // 6. ROTATION: Generate new Refresh Token and Access Token
+    // 6. ROTATION: Generate new Refresh Token and Access Token (atomic operation)
     String newAccessToken = tokenGateway.generateAccessToken(user.email());
     String newRefreshTokenValue = tokenGateway.generateRefreshToken(user.email());
     Instant newExpiryDate = tokenGateway.extractExpiration(newRefreshTokenValue);
@@ -63,11 +70,8 @@ public class RefreshTokenUseCaseImpl implements RefreshTokenUseCase {
             null
     );
 
-    // 7. Save the new token FIRST (required for foreign key constraint)
-    RefreshToken savedRefreshToken = refreshTokenGateway.save(newRefreshToken);
-
-    // 8. Revoke the old token and link it to the new one (for traceability)
-    refreshTokenGateway.revokeByToken(refreshToken, savedRefreshToken.token());
+    // 7. ATOMIC ROTATION: Save new token AND revoke old token in single transaction
+    RefreshToken savedRefreshToken = refreshTokenGateway.rotate(refreshToken, newRefreshToken);
 
     return new AuthResult(user, newAccessToken, savedRefreshToken.token());
   }

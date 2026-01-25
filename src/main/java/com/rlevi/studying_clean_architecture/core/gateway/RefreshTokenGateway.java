@@ -12,4 +12,5 @@ public interface RefreshTokenGateway {
   List<RefreshToken> findByUserId(Long userId);
   void revokeByToken(String token, String replacementToken);
   void deleteByUserId(Long userId);
+  RefreshToken rotate(String oldToken, RefreshToken newRefreshToken);
 }

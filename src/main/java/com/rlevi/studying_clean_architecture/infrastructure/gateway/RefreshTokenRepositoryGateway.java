@@ -65,4 +65,15 @@ public class RefreshTokenRepositoryGateway implements RefreshTokenGateway {
   public void deleteByUserId(Long userId) {
     refreshTokenRepository.deleteByUserId(userId);
   }
+
+  @Override
+  public RefreshToken rotate(String oldToken, RefreshToken newRefreshToken) {
+    // Save the new token first (required for foreign key constraint)
+    RefreshToken savedRefreshToken = save(newRefreshToken);
+    
+    // Atomically revoke the old token with the replacement link
+    revokeByToken(oldToken, savedRefreshToken.token());
+    
+    return savedRefreshToken;
+  }
 }
