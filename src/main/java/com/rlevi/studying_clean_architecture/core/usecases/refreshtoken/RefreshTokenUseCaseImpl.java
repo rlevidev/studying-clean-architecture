@@ -40,7 +40,7 @@ public class RefreshTokenUseCaseImpl implements RefreshTokenUseCase {
     String email;
     try {
       email = tokenGateway.extractUsername(refreshToken);
-    } catch (RuntimeException jwtException) {
+    } catch (Exception jwtException) {
       // Revoke the current token since it's malformed/invalid
       refreshTokenGateway.revokeByToken(refreshToken, null);
       throw new InvalidRefreshTokenException("Invalid or malformed refresh token. Please login again.");

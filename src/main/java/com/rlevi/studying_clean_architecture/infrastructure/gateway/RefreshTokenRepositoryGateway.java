@@ -68,10 +68,18 @@ public class RefreshTokenRepositoryGateway implements RefreshTokenGateway {
 
   @Override
   public RefreshToken rotate(String oldToken, RefreshToken newRefreshToken) {
+    // Check if old token is valid (exists and not revoked) first
+    // This prevents creating a new token when the old one is already invalid
+    Optional<RefreshToken> existingToken = findByTokenAndRevokedFalse(oldToken);
+    if (existingToken.isEmpty()) {
+      throw new IllegalStateException("Token is already revoked or invalid");
+    }
+    
     // Save the new token first (required for foreign key constraint)
     RefreshToken savedRefreshToken = save(newRefreshToken);
     
     // Atomically revoke the old token with the replacement link
+    // This will always succeed because we already verified the token is not revoked
     revokeByToken(oldToken, savedRefreshToken.token());
     
     return savedRefreshToken;
