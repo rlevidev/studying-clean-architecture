@@ -15,7 +15,7 @@ CREATE TABLE refresh_tokens (
     user_id BIGINT NOT NULL,
     expiry_date TIMESTAMP WITH TIME ZONE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    revoked BOOLEAN DEFAULT FALSE,
+    revoked BOOLEAN NOT NULL DEFAULT FALSE,
     replaced_by_token VARCHAR(500),
     CONSTRAINT fk_refresh_tokens_users FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
