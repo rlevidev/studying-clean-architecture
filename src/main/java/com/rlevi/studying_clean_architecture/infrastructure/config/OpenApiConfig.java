@@ -7,6 +7,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,5 +34,21 @@ public class OpenApiConfig {
                                     .type(SecurityScheme.Type.HTTP)
                                     .scheme("bearer")
                                     .bearerFormat("JWT")));
+  }
+
+  @Bean
+  public GroupedOpenApi publicApi() {
+    return GroupedOpenApi.builder()
+            .group("01 - Authentication")
+            .pathsToMatch("/api/v1/auth/**")
+            .build();
+  }
+
+  @Bean
+  public GroupedOpenApi userApi() {
+    return GroupedOpenApi.builder()
+            .group("02 - Users")
+            .pathsToMatch("/api/v1/users/**")
+            .build();
   }
 }
