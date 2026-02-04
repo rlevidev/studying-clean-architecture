@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+@Schema(description = "Request to register a new user")
 public record UserRegisterRequest(
         @NotBlank(message = "Name is required.")
         @Size(min = 3, max = 100, message = "Name must be between 3 and 100 characters.")
