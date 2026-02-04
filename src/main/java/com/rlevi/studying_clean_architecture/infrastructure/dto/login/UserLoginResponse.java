@@ -2,6 +2,7 @@ package com.rlevi.studying_clean_architecture.infrastructure.dto.login;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "Response to login a user")
 public record UserLoginResponse(
         @Schema(description = "Success message", example = "User logged in successfully.")
         String message,
