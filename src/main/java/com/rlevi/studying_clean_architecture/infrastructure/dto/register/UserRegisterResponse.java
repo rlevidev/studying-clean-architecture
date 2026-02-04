@@ -2,6 +2,7 @@ package com.rlevi.studying_clean_architecture.infrastructure.dto.register;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "Response to register a new user")
 public record UserRegisterResponse(
         @Schema(description = "Success message", example = "User registered successfully.")
         String message,
