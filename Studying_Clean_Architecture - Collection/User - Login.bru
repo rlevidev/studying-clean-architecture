@@ -1,0 +1,23 @@
+meta {
+  name: User - Login
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/api/v1/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "rlevi.dev@gmail.com",
+    "password": "rlevidev123"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

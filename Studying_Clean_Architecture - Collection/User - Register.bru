@@ -1,0 +1,24 @@
+meta {
+  name: User - Register
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8080/api/v1/auth/register
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "rlevidev",
+    "email": "rlevi.dev.teste2@gmail.com",
+    "password": "rlevidev123"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

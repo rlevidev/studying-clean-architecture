@@ -1,0 +1,24 @@
+meta {
+  name: Admin - Delete User By ID
+  type: http
+  seq: 8
+}
+
+delete {
+  url: http://localhost:8080/api/v1/users/delete-user?id=12
+  body: json
+  auth: bearer
+}
+
+params:query {
+  id: 12
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJybGV2aS5kZXYuYWRtaW5AZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY4NTA5MTk1LCJleHAiOjE3Njg1OTU1OTV9.K4wuOmCuk1Bc_vXpYNn2JZFLBffgB52-xU0R12ziKj-tai0IgD429Z6Wm7XCOdSi
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
