@@ -16,10 +16,13 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ErrorResponse> handleRecurseNotFound(
             ResourceNotFoundException ex, HttpServletRequest request) {
 
@@ -35,6 +38,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DuplicateResourceException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseEntity<ErrorResponse> handleDuplicateResource(
             DuplicateResourceException ex, HttpServletRequest request) {
 
@@ -110,6 +114,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorValidation> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex, HttpServletRequest request) {
 
