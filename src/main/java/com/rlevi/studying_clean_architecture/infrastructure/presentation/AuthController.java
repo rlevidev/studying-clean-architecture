@@ -13,6 +13,14 @@ import com.rlevi.studying_clean_architecture.infrastructure.dto.refreshtoken.Ref
 import com.rlevi.studying_clean_architecture.infrastructure.dto.register.UserRegisterRequest;
 import com.rlevi.studying_clean_architecture.infrastructure.dto.register.UserRegisterResponse;
 import com.rlevi.studying_clean_architecture.infrastructure.mapper.UserMapper;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import com.rlevi.studying_clean_architecture.infrastructure.dto.ErrorResponse;
+import com.rlevi.studying_clean_architecture.infrastructure.dto.ErrorValidation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +35,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/auth")
 @Validated
+@Tag(name = "01 - Authentication", description = "Endpoints for user registration, login, and token refresh")
 public class AuthController {
   private static final Logger logger = LoggerUtils.getLogger(AuthController.class);
 
@@ -44,6 +53,13 @@ public class AuthController {
 
   // Create user
   @PostMapping("/register")
+  @Operation(summary = "Register a new user", description = "Creates a new user account and returns authentication tokens")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "User registered successfully", 
+                  content = @Content(schema = @Schema(implementation = UserRegisterResponse.class))),
+          @ApiResponse(responseCode = "400", description = "Invalid input or user already exists", 
+                  content = @Content(schema = @Schema(implementation = ErrorValidation.class)))
+  })
   public ResponseEntity<UserRegisterResponse> registerUser(@Valid @RequestBody UserRegisterRequest request) {
     LoggerUtils.startRequest(logger, "POST /api/v1/auth/register", request.email());
 
@@ -66,6 +82,13 @@ public class AuthController {
 
   // User login
   @PostMapping("/login")
+  @Operation(summary = "Authenticate user", description = "Authenticates user credentials and returns JWT tokens")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Login successful", 
+                  content = @Content(schema = @Schema(implementation = UserLoginResponse.class))),
+          @ApiResponse(responseCode = "401", description = "Invalid credentials", 
+                  content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+  })
   public ResponseEntity<UserLoginResponse> loginUser(@Valid @RequestBody UserLoginRequest request) {
     LoggerUtils.startRequest(logger, "POST /api/v1/auth/login", request.email());
 
@@ -87,6 +110,13 @@ public class AuthController {
 
   // Refresh token
   @PostMapping("/refresh")
+  @Operation(summary = "Refresh access token", description = "Generates a new access token using a valid refresh token")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Token refreshed successfully", 
+                  content = @Content(schema = @Schema(implementation = RefreshTokenResponse.class))),
+          @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token", 
+                  content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+  })
   public ResponseEntity<RefreshTokenResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
     LoggerUtils.startRequest(logger, "POST /api/v1/auth/refresh", null);
 

@@ -13,10 +13,21 @@ import com.rlevi.studying_clean_architecture.infrastructure.dto.update.UserUpdat
 import com.rlevi.studying_clean_architecture.infrastructure.mapper.UserMapper;
 import com.rlevi.studying_clean_architecture.core.utils.LoggerUtils;
 import org.slf4j.Logger;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import com.rlevi.studying_clean_architecture.infrastructure.dto.ErrorResponse;
+import com.rlevi.studying_clean_architecture.infrastructure.dto.ErrorValidation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +39,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/users")
 @Validated
+@Tag(name = "02 - Users", description = "Endpoints for user management and information retrieval")
+@SecurityRequirement(name = "bearerAuth")
 public class UserController {
   private static final Logger logger = LoggerUtils.getLogger(UserController.class);
 
@@ -56,8 +69,45 @@ public class UserController {
     this.userMapper = userMapper;
   }
 
+  @GetMapping("/me")
+  @Operation(summary = "Get current user", description = "Retrieves the profile of the currently authenticated user")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Current user profile"),
+          @ApiResponse(responseCode = "401", description = "Not authenticated",
+                  content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+  })
+  public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+    LoggerUtils.startRequest(logger, "GET /api/v1/users/me", null);
+
+    String email = userDetails.getUsername();
+    LoggerUtils.logDebug(logger, "Getting current user profile", Map.of("email", email));
+
+    Optional<User> userOptional = findUserByEmailUseCase.execute(email);
+
+    if (userOptional.isPresent()) {
+      User user = userOptional.get();
+      UserResponse userResponse = userMapper.toResponse(user);
+
+      LoggerUtils.logSuccess(logger, "Current user profile retrieved",
+          Map.of("userId", user.id(), "email", user.email()));
+
+      LoggerUtils.endRequest(logger);
+      return ResponseEntity.ok(userResponse);
+    } else {
+      LoggerUtils.logWarning(logger, "Authenticated user not found in database", Map.of("email", email));
+      LoggerUtils.endRequest(logger);
+      return ResponseEntity.notFound().build();
+    }
+  }
+
   // Get all users
   @GetMapping("/all")
+  @Operation(summary = "Get all users", description = "Retrieves a list of all registered users")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Successfully retrieved list"),
+          @ApiResponse(responseCode = "403", description = "Access denied", 
+                  content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+  })
   public ResponseEntity<List<UserResponse>> getAllUsers() {
     LoggerUtils.startRequest(logger, "GET /api/v1/users/all", null);
 
@@ -81,6 +131,12 @@ public class UserController {
 
   // Get user by id
   @GetMapping("/{id}")
+  @Operation(summary = "Get user by ID", description = "Retrieves a specific user using their ID")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "User found"),
+          @ApiResponse(responseCode = "404", description = "User not found", 
+                  content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+  })
   public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
     LoggerUtils.startRequest(logger, "GET /api/v1/users/" + id, null);
     
@@ -111,6 +167,12 @@ public class UserController {
 
   // Get user by email
   @GetMapping()
+  @Operation(summary = "Get user by email", description = "Retrieves a specific user using their email address")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "User found"),
+          @ApiResponse(responseCode = "404", description = "User not found", 
+                  content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+  })
   public ResponseEntity<UserResponse> getUserByEmail(@RequestParam("email") @Email(message = "Invalid email format.") String email){
     LoggerUtils.startRequest(logger, "GET /api/v1/users?email=" + email, null);
 
@@ -140,6 +202,12 @@ public class UserController {
 
   // Verify if user exists by email
   @GetMapping("/verify-exists")
+  @Operation(summary = "Verify if user exists", description = "Checks if a user exists in the system by email")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "User exists"),
+          @ApiResponse(responseCode = "404", description = "User does not exist", 
+                  content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+  })
   public ResponseEntity<UserExistsResponse> checkExists(@RequestParam("email") @Email(message = "Invalid email format.") String email){
     LoggerUtils.startRequest(logger, "GET /api/v1/users/verify-exists", email);
 
@@ -177,6 +245,12 @@ public class UserController {
   
   // Delete user by id
   @DeleteMapping("/delete-user")
+  @Operation(summary = "Delete user", description = "Removes a user from the system by ID")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "User deleted successfully"),
+          @ApiResponse(responseCode = "404", description = "User not found", 
+                  content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+  })
   public ResponseEntity<Map<String, String>> deleteUser(@RequestParam("id") @NotNull Long id){
     LoggerUtils.startRequest(logger, "DELETE /api/v1/users/delete-user?id=" + id, null);
 
@@ -196,6 +270,14 @@ public class UserController {
 
   // Update user
   @PutMapping("/update")
+  @Operation(summary = "Update user", description = "Updates an existing user's information")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "User updated successfully"),
+          @ApiResponse(responseCode = "400", description = "Invalid input", 
+                  content = @Content(schema = @Schema(implementation = ErrorValidation.class))),
+          @ApiResponse(responseCode = "404", description = "User not found", 
+                  content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+  })
   public ResponseEntity<UserResponse> updateUser(@RequestParam("id") @NotNull Long id, @Valid @RequestBody UserUpdateRequest request) {
     LoggerUtils.startRequest(logger, "PUT /api/v1/users/update?id=" + id, null);
 
