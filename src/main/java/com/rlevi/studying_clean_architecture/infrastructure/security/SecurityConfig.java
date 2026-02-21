@@ -57,7 +57,8 @@ public class SecurityConfig {
                             AntPathRequestMatcher.antMatcher("/error"),
                             AntPathRequestMatcher.antMatcher("/v3/api-docs/**"),
                             AntPathRequestMatcher.antMatcher("/swagger-ui/**"),
-                            AntPathRequestMatcher.antMatcher("/swagger-ui.html")
+                            AntPathRequestMatcher.antMatcher("/swagger-ui.html"),
+                            AntPathRequestMatcher.antMatcher("/h2-console/**")
                     ).permitAll()
                     .anyRequest().authenticated())
             .exceptionHandling(ex -> ex.accessDeniedHandler(customAcessDeniedHandler)
