@@ -1,9 +1,0 @@
-{
-  "version": "1",
-  "name": "Studying_Clean_Architecture - Collection",
-  "type": "collection",
-  "ignore": [
-    "node_modules",
-    ".git"
-  ]
-}
