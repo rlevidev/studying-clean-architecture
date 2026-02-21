@@ -34,3 +34,8 @@ build/
 
 ### Environment Variables ###
 .env
+
+### Tools ###
+.kilocode/
+.megamemory/
+Studying_Clean_Architecture - Collection/
