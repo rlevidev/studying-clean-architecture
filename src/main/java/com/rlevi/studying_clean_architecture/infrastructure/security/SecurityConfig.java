@@ -3,6 +3,7 @@ package com.rlevi.studying_clean_architecture.infrastructure.security;
 import com.rlevi.studying_clean_architecture.infrastructure.exception.CustomAcessDeniedHandler;
 import com.rlevi.studying_clean_architecture.infrastructure.exception.CustomAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,16 +21,21 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+  @Value("${spring.h2.console.enabled:false}")
+  private boolean h2ConsoleEnabled;
+
   @Autowired
   private CustomAcessDeniedHandler customAcessDeniedHandler;
 
@@ -51,12 +57,21 @@ public class SecurityConfig {
                     .frameOptions(frameOptionsConfig -> frameOptionsConfig.sameOrigin()))
             .sessionManagement(session -> session
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(authorize -> authorize
-                    .requestMatchers(
+            .authorizeHttpRequests(authorize -> {
+                    authorize.requestMatchers(
                             AntPathRequestMatcher.antMatcher("/api/v1/auth/**"),
-                            AntPathRequestMatcher.antMatcher("/error")
-                    ).permitAll()
-                    .anyRequest().authenticated())
+                            AntPathRequestMatcher.antMatcher("/error"),
+                            AntPathRequestMatcher.antMatcher("/v3/api-docs/**"),
+                            AntPathRequestMatcher.antMatcher("/swagger-ui/**"),
+                            AntPathRequestMatcher.antMatcher("/swagger-ui.html")
+                    ).permitAll();
+                    
+                    if (h2ConsoleEnabled) {
+                        authorize.requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll();
+                    }
+                    
+                    authorize.anyRequest().authenticated();
+            })
             .exceptionHandling(ex -> ex.accessDeniedHandler(customAcessDeniedHandler)
                     .authenticationEntryPoint(customAuthenticationEntryPoint))
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
