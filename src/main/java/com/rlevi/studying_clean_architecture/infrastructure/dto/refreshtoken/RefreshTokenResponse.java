@@ -2,7 +2,7 @@ package com.rlevi.studying_clean_architecture.infrastructure.dto.refreshtoken;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "Response containing a new access token and refresh token details")
+@Schema(description = "Response containing refreshed tokens")
 public record RefreshTokenResponse(
         @Schema(description = "Success message", example = "Token refreshed successfully.")
         String message,

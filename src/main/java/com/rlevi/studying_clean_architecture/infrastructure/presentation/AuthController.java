@@ -59,7 +59,7 @@ public class AuthController {
                   content = @Content(schema = @Schema(implementation = UserRegisterResponse.class))),
           @ApiResponse(responseCode = "400", description = "Invalid input data", 
                   content = @Content(schema = @Schema(implementation = ErrorValidation.class))),
-          @ApiResponse(responseCode = "409", description = "User already exists", 
+          @ApiResponse(responseCode = "409", description = "User with this email already exists", 
                   content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   public ResponseEntity<UserRegisterResponse> registerUser(@Valid @RequestBody UserRegisterRequest request) {

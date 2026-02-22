@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Instant;
 
-@Schema(description = "User data transfer object representing a registered user")
+@Schema(description = "User information")
 public record UserResponse(
         @Schema(description = "User's ID", example = "1")
         Long id,

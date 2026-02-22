@@ -110,8 +110,8 @@ Esta camada contém as ferramentas e frameworks. É aqui que o Spring, JPA e out
 
 ## 📋 Como Executar
 
-1. Clone: `git clone https://github.com/rlevidev/studying-clean-architecture.git`
-2. Rode: `cd studying-clean-architecture && ./mvnw spring-boot:run`
+1. Clone: `git clone https://github.com/rlevi/studying_clean_architecture.git`
+2. Rode: `./mvnw spring-boot:run`
 3. Teste: Acesse `http://localhost:8080/swagger-ui.html` para ver a documentação.
 
 ---
