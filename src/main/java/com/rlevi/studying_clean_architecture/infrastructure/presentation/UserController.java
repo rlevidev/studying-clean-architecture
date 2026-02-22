@@ -77,9 +77,9 @@ public class UserController {
                   content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
-    LoggerUtils.startRequest(logger, "GET /api/v1/users/me", null);
-
     String email = userDetails.getUsername();
+    LoggerUtils.startRequest(logger, "GET /api/v1/users/me", email);
+
     LoggerUtils.logDebug(logger, "Getting current user profile", Map.of("email", email));
 
     Optional<User> userOptional = findUserByEmailUseCase.execute(email);

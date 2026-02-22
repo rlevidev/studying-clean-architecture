@@ -110,8 +110,8 @@ This layer contains tools and frameworks. This is where Spring, JPA, and other l
 
 ## 📋 How to Run
 
-1. Clone: `git clone https://github.com/rlevi/studying_clean_architecture.git`
-2. Run: `./mvnw spring-boot:run`
+1. Clone: `git clone https://github.com/rlevidev/studying-clean-architecture.git`
+2. Run: `cd studying-clean-architecture && ./mvnw spring-boot:run`
 3. Test: Access `http://localhost:8080/swagger-ui.html` to see the documentation.
 
 ---
