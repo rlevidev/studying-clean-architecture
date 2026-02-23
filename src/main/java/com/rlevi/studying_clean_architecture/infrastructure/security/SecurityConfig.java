@@ -57,8 +57,11 @@ public class SecurityConfig {
                     .frameOptions(frameOptionsConfig -> frameOptionsConfig.sameOrigin()))
             .sessionManagement(session -> session
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(authorize -> {
-                    authorize.requestMatchers(
+            .authorizeHttpRequests(authorize -> authorize
+                    .requestMatchers(
+                            AntPathRequestMatcher.antMatcher("/"),
+                            AntPathRequestMatcher.antMatcher("/css/**"),
+                            AntPathRequestMatcher.antMatcher("/js/**"),
                             AntPathRequestMatcher.antMatcher("/api/v1/auth/**"),
                             AntPathRequestMatcher.antMatcher("/error"),
                             AntPathRequestMatcher.antMatcher("/v3/api-docs/**"),
